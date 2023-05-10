@@ -78,7 +78,7 @@ response:
 status 200
 {
   name: string, // null if the user is newly registered
-  birthday: string, // null
+  birthday: number, // null
   phone: string, // null
   city: string, // null
   email: string,
@@ -98,7 +98,7 @@ response:
 status 200
 {
   name: string,
-  birthday: string,
+  birthday: number,
   phone: string,
   city: string,
   email: string,
