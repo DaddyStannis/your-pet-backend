@@ -57,6 +57,9 @@ const schemas = {
 };
 
 schema.post("save", handleMongooseError);
+schema.post("update", handleMongooseError);
+schema.post("findOneAndUpdate", handleMongooseError);
+schema.post("insertMany", handleMongooseError);
 
 const User = model("user", schema);
 
