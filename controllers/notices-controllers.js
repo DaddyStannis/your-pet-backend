@@ -3,12 +3,12 @@ import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
 // для пошуку оголошеннь по заголовку
-const getNoticesByTitle = async (req, res) => {
-    const { title, category, page = 1, limit = 10 } = req.query
+const getNoticesByTitleandKeyword = async (req, res) => {
+    const { title, page = 1, limit = 10 } = req.query
     const skip = (page - 1) * limit
 
     const regex = new RegExp(title, "i");
-    const result = await Notice.find({ title: regex, category }, '', { skip, limit }).all('favorite', favorite)
+    const result = await Notice.find({ title: regex }, '', { skip, limit }).populate("owner")
 
     if (result.length === 0) {
         throw HttpError(404, "Not found");
@@ -24,7 +24,7 @@ const getNoticesByCategory = async (req, res) => {
 
     const notices = await Notice.find({
         category: category ? category : "sell",
-    }, '',  { skip, limit }).all('favorite', favorite)
+    }, '',  { skip, limit }).populate("owner")
 
     res.json(notices)
 }
@@ -32,7 +32,7 @@ const getNoticesByCategory = async (req, res) => {
 // для отримання одного оголошення
 const getNoticeById = async (req, res) => {
     const { noticeId } = req.params
-    const result = await Notice.findById(noticeId)
+    const result = await Notice.findById(noticeId).populate("owner")
     if (!result) {
       throw HttpError(404, `Notice with ${noticeId} not found`)
     }
@@ -56,9 +56,9 @@ const updateFavoriteNotice = async (req, res) => {
 // для отримання оголошень авторизованого користувача доданих ним же в обрані
 const listFavoriteNotices = async (req, res) => {
   const { _id: owner } = req.user
-  const { page = 1, limit = 10, favorite = false} = req.query;
+  const { page = 1, limit = 10, favorite} = req.query;
   const skip = (page - 1) * limit
-  const result = await Notice.find({ owner }, '', { skip, limit }).all('favorite', favorite)
+  const result = await Notice.find({ owner, favorite: true }, '', { skip, limit })
   res.json(result)
 }
 
@@ -82,6 +82,7 @@ const listNotices = async (req, res) => {
 // для видалення оголошення авторизованого користувача створеного цим же користувачем 
 const removeNotice = async (req, res) => {
     const { noticeId } = req.params
+
     const result = await Notice.findByIdAndDelete(noticeId)
     if (!result) {
       throw HttpError(404, `Notice with ${noticeId} not found`)
@@ -89,22 +90,8 @@ const removeNotice = async (req, res) => {
     res.status(200).json({message: "Notice deleted"})
   }
 
-// ADDITIONALY I`M NOT SURE THAT WE NEED THIS
-// FOR EDIT YOUR NOTICE
-const updateNoticeById = async (req, res) => {
-    const { noticeId } = req.params
-    const result = await Notice.findByIdAndUpdate(noticeId, req.body, {new: true})
-    if (!result) {
-      throw HttpError(404, `Notice with ${noticeId} not found`)
-    }
-    if (JSON.stringify(req.body) === '{}') {
-      throw HttpError(400, 'missing fields')
-    }
-    res.json(result)
-}
-
 export default {
-    getNoticesByTitle: ctrlWrapper(getNoticesByTitle),
+    getNoticesByTitleandKeyword: ctrlWrapper(getNoticesByTitleandKeyword),
     getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
     getNoticeById: ctrlWrapper(getNoticeById),
     updateFavoriteNotice: ctrlWrapper(updateFavoriteNotice),
@@ -112,5 +99,4 @@ export default {
     addNotice: ctrlWrapper(addNotice),
     listNotices: ctrlWrapper(listNotices),
     removeNotice: ctrlWrapper(removeNotice),
-    updateNoticeById: ctrlWrapper(updateNoticeById),
 }

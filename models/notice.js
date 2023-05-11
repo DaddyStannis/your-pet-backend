@@ -70,6 +70,9 @@ const addNoticeSchema = Joi.object({
     category: Joi.string().regex(/^(my pet|sell|lost-found|for-free)$/).required().messages({
         'any.required': 'missing field category'
     }),
+    title: Joi.string().pattern(/^[A-Za-z ]+$/).required().messages({
+        'any.required': 'missing required title field'
+    }),
     type: Joi.string().pattern(/^[A-Za-z ]+$/).required().messages({
         'any.required': 'missing required type field'
     }),
@@ -102,15 +105,15 @@ const addNoticeSchema = Joi.object({
     favorite: Joi.boolean()
 })
 
-const patchPetFavoriteSchema = Joi.object({
+const patchNoticeFavoriteSchema = Joi.object({
     favorite: Joi.boolean().required().messages({
         'any.required': 'missing field favorite'
     })
- })
+})
 
 const schemas = {
     addNoticeSchema,
-    patchPetFavoriteSchema,
+    patchNoticeFavoriteSchema,
 };
 
 const Notice = model("notice", noticeSchema)
