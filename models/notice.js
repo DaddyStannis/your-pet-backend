@@ -8,6 +8,10 @@ const noticeSchema = new Schema({
         enum: ["my pet", "sell", "lost-found", "for-free"],
         required: [true, "Set category for your pet"]
     },
+    title: {
+        type: String,
+        require: [true, "Set the title to your notice"]
+    },
     type: {
         type: String,
         required: [true, "Set type of your pet"]
@@ -72,7 +76,7 @@ const addNoticeSchema = Joi.object({
     name: Joi.string().min(2).max(16).required().messages({
         'any.required': 'missing required name field'
     }),
-    birth: Joi.number(),
+    birth: Joi.date(),
     breed: Joi.string().min(2).max(16).required().messages({
         'any.required': 'missing required breed field'
     }),
