@@ -4,6 +4,7 @@ import cors from "cors";
 import "dotenv/config.js";
 
 import usersRouter from "./routes/api/users.js";
+import newsRouter from "./routes/api/news.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/users", usersRouter);
+app.use("/news", newsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
