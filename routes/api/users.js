@@ -17,7 +17,11 @@ router.post("/login", validateBody(schemas.loginSchema), controllers.login);
 
 router.post("/logout", authenticate, controllers.logout);
 
-router.get("/current", authenticate, controllers.current);
+router.get(
+  "/current",
+  validateBody(schemas.refreshSchema),
+  controllers.current
+);
 
 router.get("/me", authenticate, controllers.getUserInfo);
 

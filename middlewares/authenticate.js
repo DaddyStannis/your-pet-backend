@@ -3,7 +3,7 @@ import JWT from "jsonwebtoken";
 import { User } from "../models/users.js";
 import { HttpError } from "../helpers/index.js";
 
-const { SECRET_KEY } = process.env;
+const { ACCESS_SECRET_KEY } = process.env;
 
 async function authenticate(req, res, next) {
   const { authorization = "" } = req.headers;
@@ -14,14 +14,14 @@ async function authenticate(req, res, next) {
   }
 
   try {
-    var { id } = JWT.verify(token, SECRET_KEY);
+    var { id } = JWT.verify(token, ACCESS_SECRET_KEY);
   } catch {
     next(HttpError(401));
   }
 
   const user = await User.findById(id);
 
-  if (!user || !user.token) {
+  if (!user || !user.accessToken) {
     next(HttpError(401));
   }
   req.user = user;

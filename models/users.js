@@ -36,7 +36,8 @@ const schema = new Schema(
       type: String,
       required: true,
     },
-    token: { type: String, default: "" },
+    refreshToken: { type: String, default: "" },
+    accessToken: { type: String, default: "" },
   },
   { versionKey: false, timestamps: true }
 );
@@ -51,9 +52,14 @@ const loginSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
 });
 
+const refreshSchema = Joi.object({
+  refreshToken: Joi.string().required(),
+});
+
 const schemas = {
   registerSchema,
   loginSchema,
+  refreshSchema,
 };
 
 schema.post("save", handleMongooseError);
