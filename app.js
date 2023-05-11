@@ -4,6 +4,7 @@ import cors from "cors";
 import "dotenv/config.js";
 
 import usersRouter from "./routes/api/users.js";
+import petsRouter from "./routes/api/pets-routes.js";
 
 const app = express();
 
