@@ -111,22 +111,26 @@ async function updateUserInfo(req, res) {
   });
 }
 
-
 const addToFavorites = async (req, res) => {
     const { noticeId } = req.params
     const { _id } = req.user
   
     const user = await User.findById(_id)
-
-    if (!user) {
-      return res.status(404).json({ message: 'The user is not found' })
+  
+    const notice = await Notice.findById(noticeId)
+    if (!notice) {
+      throw HttpError(404, `Notice with ${noticeId} not found`)
+    }
+  
+    if (user.favorites.includes(noticeId)) {
+      throw HttpError(400, 'The notice is already in yours favorites')
     }
 
     user.favorites.push(noticeId)
 
     await user.save()
 
-    return res.status(200).json({ message: 'The notice is in the favorites' })
+    return res.status(200).json({ message: 'The notice is in yours favorites' })
 };
 
 const removeFromFavorites = async (req, res) => {
@@ -143,7 +147,7 @@ const removeFromFavorites = async (req, res) => {
 
     await user.save();
 
-    return res.status(200).json({ message: 'The notice is not in the favorites' });
+    return res.status(200).json({ message: 'The notice is not in yours favorites' });
 };
 
 const getUserFavorites = async (req, res) => {

@@ -3,6 +3,8 @@ import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
+const petAvatarsDirPath = path.resolve("public", "petPhotos");
+
 // для пошуку оголошеннь по заголовку
 const getNoticesByTitleandKeyword = async (req, res) => {
     const { title, page = 1, limit = 10 } = req.query
@@ -56,8 +58,6 @@ const getNoticeById = async (req, res) => {
 }
 
 // для додавання оголошень відповідно до обраної категорії
-const petAvatarsDirPath = path.resolve("public", "petPhotos");
-
 const addNotice = async (req, res) => {
     const { _id: owner } = req.user
     

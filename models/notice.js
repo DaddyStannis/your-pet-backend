@@ -53,10 +53,6 @@ const noticeSchema = new Schema({
         maxLength: 120,
         default: null
     },
-    favorite: {
-        type: Boolean,
-        default: false
-    },
     owner: {
         type: Schema.Types.ObjectId,
         ref: 'user',
@@ -102,7 +98,6 @@ const addNoticeSchema = Joi.object({
         'any.required': 'missing required price field'
   }),
     comments: Joi.string().min(8).max(120).regex(/^[\s\S]*.*[^\s][\s\S]*$/),
-    favorite: Joi.boolean(),
 })
 
 
