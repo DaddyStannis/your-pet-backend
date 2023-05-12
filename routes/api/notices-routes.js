@@ -13,6 +13,9 @@ router.get("/find/byTitle", noticesControllers.getNoticesByTitleandKeyword)
 // створити ендпоінт для отримання оголошень по категоріям ++
 router.get("/find/byCategory", noticesControllers.getNoticesByCategory)
 
+// створити ендпоінт для отримання оголошень по заголовку та по категоріям 
+router.get("/find", noticesControllers.findNotices)
+
 // створити ендпоінт для отримання одного оголошення ++ (in some reason the function "isValidId" is not working)
 router.get("/find/:noticeId", noticesControllers.getNoticeById)
 

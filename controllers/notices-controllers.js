@@ -30,6 +30,15 @@ const getNoticesByCategory = async (req, res) => {
     res.json(notices)
 }
 
+const findNotices = async (req, res) => {
+  const { title, category, page = 1, limit = 10 } = req.query
+  const skip = (page - 1) * limit
+
+  const regex = new RegExp(title, "i");
+  const notices = await Notice.find({title: regex, category: category ? category : "sell"}, '',  { skip, limit })
+  res.json(notices)
+}
+
 // для отримання одного оголошення
 const getNoticeById = async (req, res) => {
     const { noticeId } = req.params
@@ -100,6 +109,7 @@ const removeNotice = async (req, res) => {
 export default {
     getNoticesByTitleandKeyword: ctrlWrapper(getNoticesByTitleandKeyword),
     getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
+    findNotices: ctrlWrapper(findNotices),
     getNoticeById: ctrlWrapper(getNoticeById),
     updateFavoriteNotice: ctrlWrapper(updateFavoriteNotice),
     listFavoriteNotices: ctrlWrapper(listFavoriteNotices),
