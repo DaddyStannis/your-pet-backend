@@ -1,3 +1,4 @@
+import path from "path";
 import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
@@ -64,18 +65,25 @@ const listFavoriteNotices = async (req, res) => {
 
 
 // для додавання оголошень відповідно до обраної категорії
+const petAvatarsDirPath = path.resolve("public", "petPhotos");
+
 const addNotice = async (req, res) => {
-    const {_id: owner} = req.user
-    const result = await Notice.create({...req.body, owner})
+    const { _id: owner } = req.user
+    
+    await moveFile(req.file, petAvatarsDirPath);
+    await resizeImg(path.join(petAvatarsDirPath, req.file.filename), 300);
+    const file = path.join("petPhotos", req.file.filename)
+
+    const result = await Notice.create({...req.body, file, owner})
     res.status(201).json(result);
 }
 
 // для отримання оголошень авторизованого кристувача створених цим же користувачем
 const listNotices = async (req, res) => {
   const { _id: owner } = req.user
-  const { page = 1, limit = 10, favorite = false} = req.query;
+  const { page = 1, limit = 10 } = req.query;
   const skip = (page - 1) * limit
-  const result = await Notice.find({ owner }, '', { skip, limit }).all('favorite', favorite)
+  const result = await Notice.find({ owner }, '', { skip, limit })
   res.json(result)
 }
 
