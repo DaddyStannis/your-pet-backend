@@ -43,14 +43,13 @@ const getNoticeById = async (req, res) => {
 // для додавання оголошення до обраних
 // для видалення оголошення авторизованого користувача доданих цим же до обраних
 const updateFavoriteNotice = async (req, res) => {
-  const { noticeId } = req.params
+    const { noticeId } = req.params
+    
   const result = await Notice.findByIdAndUpdate(noticeId, req.body, { new: true })
   if (!result) {
     throw HttpError(404, 'Not found')
   }
-   if (JSON.stringify(req.body) === '{}') {
-      throw HttpError(400, 'missing field favorite')
-    }
+
   res.json(result)
 }
 
