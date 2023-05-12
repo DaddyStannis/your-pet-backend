@@ -87,7 +87,17 @@ const removeNotice = async (req, res) => {
       throw HttpError(404, `Notice with ${noticeId} not found`)
     }
     res.status(200).json({message: "Notice deleted"})
-  }
+}
+  
+const allListNotices = async (req, res) => {
+    const notices = await Notice.find();
+
+    if (notices.length === 0) {
+      return res.status(404).json({ message: 'Notices not found' });
+    }
+
+    res.status(200).json({ notices })
+}
 
 export default {
     getNoticesByTitleandKeyword: ctrlWrapper(getNoticesByTitleandKeyword),
@@ -96,5 +106,6 @@ export default {
     getNoticeById: ctrlWrapper(getNoticeById),
     addNotice: ctrlWrapper(addNotice),
     listNotices: ctrlWrapper(listNotices),
-    removeNotice: ctrlWrapper(removeNotice),
+  removeNotice: ctrlWrapper(removeNotice),
+    allListNotices: ctrlWrapper(allListNotices),
 }

@@ -25,6 +25,8 @@ router.post("/", authenticate, upload.single("photoURL"), validateBody(schemas.a
 // створити ендпоінт для отримання оголошень авторизованого кристувача створених цим же користувачем ++
 router.get("/", authenticate, noticesControllers.listNotices)
 
+router.get("/all", noticesControllers.allListNotices)
+
 // створити ендпоінт для видалення оголошення авторизованого користувача створеного цим же користувачем ++ (how to remove just users notices??)
 router.delete("/:noticeId", authenticate, noticesControllers.removeNotice)
 
