@@ -30,12 +30,18 @@ const getNoticesByCategory = async (req, res) => {
     res.json(notices)
 }
 
+// для отримання оголошень по категоріям + по заголовку
 const findNotices = async (req, res) => {
   const { title, category, page = 1, limit = 10 } = req.query
   const skip = (page - 1) * limit
 
   const regex = new RegExp(title, "i");
-  const notices = await Notice.find({title: regex, category: category ? category : "sell"}, '',  { skip, limit })
+  const notices = await Notice.find({ title: regex, category: category ? category : "sell" }, '', { skip, limit })
+  
+  if (notices.length === 0) {
+        throw HttpError(404, "Not found");
+  }
+
   res.json(notices)
 }
 
@@ -64,10 +70,15 @@ const updateFavoriteNotice = async (req, res) => {
 
 // для отримання оголошень авторизованого користувача доданих ним же в обрані
 const listFavoriteNotices = async (req, res) => {
-  const { _id: owner } = req.user
-  const { page = 1, limit = 10, favorite} = req.query;
+  // const { _id: owner } = req.user
+  const { page = 1, limit = 10, favorite = true} = req.query;
   const skip = (page - 1) * limit
-  const result = await Notice.find({ owner, favorite: true }, '', { skip, limit })
+  const result = await Notice.find({ favorite }, '', { skip, limit })
+
+  if (result.length === 0) {
+        throw HttpError(404, "You don`t have favorite notice yet");
+  }
+
   res.json(result)
 }
 

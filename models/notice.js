@@ -113,7 +113,7 @@ const patchNoticeFavoriteSchema = Joi.object({
 
 const schemas = {
     addNoticeSchema,
-    // patchNoticeFavoriteSchema,
+    patchNoticeFavoriteSchema,
 };
 
 const Notice = model("notice", noticeSchema)

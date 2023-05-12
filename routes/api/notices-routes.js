@@ -21,7 +21,7 @@ router.get("/find/:noticeId", noticesControllers.getNoticeById)
 
 // створити ендпоінт для додавання оголошення до обраних ++
 // створити ендпоінт для видалення оголошення авторизованого користувача доданих цим же до обраних ++ (in some reason the function "isValidId" is not working)
-router.patch("/:noticeId/favorite", validateBody(schemas.patchNoticeFavoriteSchema), noticesControllers.updateFavoriteNotice)
+router.patch("/favorite/:noticeId", validateBody(schemas.patchNoticeFavoriteSchema), noticesControllers.updateFavoriteNotice)
 
 // створити ендпоінт для отримання оголошень авторизованого користувача доданих ним же в обрані ++
 router.get("/favorite", authenticate, noticesControllers.listFavoriteNotices)
@@ -32,7 +32,7 @@ router.post("/", authenticate, upload.single("file"), validateBody(schemas.addNo
 // створити ендпоінт для отримання оголошень авторизованого кристувача створених цим же користувачем ++
 router.get("/", authenticate, noticesControllers.listNotices)
 
-// створити ендпоінт для видалення оголошення авторизованого користувача створеного цим же користувачем +- (how to remove just users notices??)
+// створити ендпоінт для видалення оголошення авторизованого користувача створеного цим же користувачем ++ (how to remove just users notices??)
 router.delete("/:noticeId", authenticate, noticesControllers.removeNotice)
 
 export default router;
