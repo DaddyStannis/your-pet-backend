@@ -5,6 +5,8 @@ import "dotenv/config.js";
 
 import usersRouter from "./routes/api/users.js";
 import petsRouter from "./routes/api/pets-routes.js";
+import newsRouter from "./routes/api/news.js";
+import sponsorsRouter from "./routes/api/sponsors.js";
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.use(express.static("public"));
 
 app.use("/users", usersRouter);
 app.use("/pets", petsRouter);
+app.use("/news", newsRouter);
+app.use("/sponsors", sponsorsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
