@@ -4,6 +4,7 @@ import cors from "cors";
 import "dotenv/config.js";
 
 import usersRouter from "./routes/api/users.js";
+import petsRouter from "./routes/api/pets-routes.js";
 import newsRouter from "./routes/api/news.js";
 import sponsorsRouter from "./routes/api/sponsors.js";
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/users", usersRouter);
+app.use("/pets", petsRouter);
 app.use("/news", newsRouter);
 app.use("/sponsors", sponsorsRouter);
 
