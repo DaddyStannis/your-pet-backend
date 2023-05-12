@@ -19,9 +19,9 @@ const addPet = async (req, res) => {
 
     await moveFile(req.file, petAvatarsDirPath);
     await resizeImg(path.join(petAvatarsDirPath, req.file.filename), 300);
-    const file = path.join("petPhotos", req.file.filename)
+    const photoURL = path.join("petPhotos", req.file.filename)
 
-    const result = await Pet.create({ ...req.body, file, owner });
+    const result = await Pet.create({ ...req.body, photoURL, owner });
     
     res.status(201).json(result);
 }

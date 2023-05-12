@@ -11,7 +11,7 @@ router.use(authenticate)
 
 router.get('/', petsControllers.listPet)
 
-router.post('/', upload.single('file'), validateBody(schemas.addPetSchema), petsControllers.addPet)
+router.post('/', upload.single('photoURL'), validateBody(schemas.addPetSchema), petsControllers.addPet)
 
 router.delete('/:id', petsControllers.deletePet)
 

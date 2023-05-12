@@ -28,7 +28,7 @@ const petSchema = new Schema({
         maxLength: 16,
         required: [true, "Set breed of your pet"]
     },
-    file: {
+    photoURL: {
         type: String,
     },
     sex: {
@@ -72,7 +72,7 @@ const addPetSchema = Joi.object({
     breed: Joi.string().min(2).max(16).required().messages({
     'any.required': 'missing required breed field'
   }),
-    file: Joi.string(),
+    photoURL: Joi.string(),
     sex: Joi.string().regex(/^(male|female)$/).required().messages({
         'any.required': 'missing required sex field'
     }),
