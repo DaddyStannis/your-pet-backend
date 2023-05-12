@@ -3,6 +3,7 @@ import gravatar from "gravatar";
 import path from "path";
 
 import { User } from "../models/users.js";
+import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import {
   createToken,
@@ -110,6 +111,55 @@ async function updateUserInfo(req, res) {
   });
 }
 
+
+const addToFavorites = async (req, res) => {
+    const { noticeId } = req.params
+    const { _id } = req.user
+  
+    const user = await User.findById(_id)
+
+    if (!user) {
+      return res.status(404).json({ message: 'The user is not found' })
+    }
+
+    user.favorites.push(noticeId)
+
+    await user.save()
+
+    return res.status(200).json({ message: 'The notice is in the favorites' })
+};
+
+const removeFromFavorites = async (req, res) => {
+    const { noticeId } = req.params
+    const { _id } = req.user
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'The user is not found' });
+    }
+
+    user.favorites = user.favorites.filter((favorite) => favorite !== noticeId);
+
+    await user.save();
+
+    return res.status(200).json({ message: 'The notice is not in the favorites' });
+};
+
+const getUserFavorites = async (req, res) => {
+    const { _id } = req.user;
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'The user is not found' });
+    }
+
+    const favoriteNotices = await Notice.find({ _id: { $in: user.favorites } });
+
+    return res.status(200).json(favoriteNotices);
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
@@ -118,4 +168,7 @@ export default {
   updateAvatar: ctrlWrapper(updateAvatar),
   getUserInfo: ctrlWrapper(getUserInfo),
   updateUserInfo: ctrlWrapper(updateUserInfo),
+  addToFavorites: ctrlWrapper(addToFavorites),
+  removeFromFavorites: ctrlWrapper(removeFromFavorites),
+  getUserFavorites: ctrlWrapper(getUserFavorites),
 };

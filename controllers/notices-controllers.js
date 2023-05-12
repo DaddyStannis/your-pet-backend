@@ -1,6 +1,5 @@
 import path from "path";
 import { Notice } from "../models/notice.js";
-import { FavoriteNotice } from "../models/favoriteNotice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
@@ -56,51 +55,6 @@ const getNoticeById = async (req, res) => {
     res.json(result)
 }
 
-// для додавання оголошення до обраних
-// для видалення оголошення авторизованого користувача доданих цим же до обраних
-const updateFavoriteNotice = async (req, res) => {
-  const { noticeId } = req.params
-  const { _id } = req.user
-
-  const notice = await Notice.findById(noticeId)
-  if (!notice) {
-    throw HttpError(404, 'Not found')
-  }
-
-  const updatedNotice = {
-    ...notice.toObject(),
-    favoriteUsers: [...notice.favoriteUsers, _id] // Додати ідентифікатор користувача до масиву ідентифікаторів улюблених користувачів
-  }
-
-  const result = await Notice.findByIdAndUpdate(noticeId, updatedNotice, { new: true })
-  if (!result) {
-    throw HttpError(404, 'Not found')
-  }
-
-  res.json(result)
-}
-
-// для отримання оголошень авторизованого користувача доданих ним же в обрані
-const listFavoriteNotices = async (req, res) => {
-  const { _id: owner } = req.user
-  const { page = 1, limit = 10 } = req.query
-  const skip = (page - 1) * limit
-
-  const favoriteNotices = await FavoriteNotice.find({ userId: owner })
-    .skip(skip)
-    .limit(limit)
-    .populate('noticeId')
-
-  if (favoriteNotices.length === 0) {
-    throw HttpError(404, "You don't have any favorite notices yet")
-  }
-
-  const result = favoriteNotices.map(({ noticeId }) => noticeId)
-
-  res.json(result)
-}
-
-
 // для додавання оголошень відповідно до обраної категорії
 const petAvatarsDirPath = path.resolve("public", "petPhotos");
 
@@ -140,8 +94,6 @@ export default {
     getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
     findNotices: ctrlWrapper(findNotices),
     getNoticeById: ctrlWrapper(getNoticeById),
-    updateFavoriteNotice: ctrlWrapper(updateFavoriteNotice),
-    listFavoriteNotices: ctrlWrapper(listFavoriteNotices),
     addNotice: ctrlWrapper(addNotice),
     listNotices: ctrlWrapper(listNotices),
     removeNotice: ctrlWrapper(removeNotice),

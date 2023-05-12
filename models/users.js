@@ -37,6 +37,10 @@ const schema = new Schema(
       required: true,
     },
     token: { type: String, default: "" },
+    favorites: {
+      type: Array,
+      default: []
+    },
   },
   { versionKey: false, timestamps: true }
 );

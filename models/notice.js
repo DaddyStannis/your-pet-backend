@@ -57,10 +57,6 @@ const noticeSchema = new Schema({
         type: Boolean,
         default: false
     },
-    favoriteUsers: {
-        type: Array,
-        default: []
-    },
     owner: {
         type: Schema.Types.ObjectId,
         ref: 'user',
@@ -107,18 +103,11 @@ const addNoticeSchema = Joi.object({
   }),
     comments: Joi.string().min(8).max(120).regex(/^[\s\S]*.*[^\s][\s\S]*$/),
     favorite: Joi.boolean(),
-    favoriteUsers: Joi.array()
 })
 
-const patchNoticeFavoriteSchema = Joi.object({
-    favorite: Joi.boolean().required().messages({
-        'any.required': 'missing field favorite'
-    })
-})
 
 const schemas = {
     addNoticeSchema,
-    patchNoticeFavoriteSchema,
 };
 
 const Notice = model("notice", noticeSchema)
