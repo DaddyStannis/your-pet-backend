@@ -1,5 +1,6 @@
 import path from "path";
 import { Notice } from "../models/notice.js";
+import { FavoriteNotice } from "../models/favoriteNotice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
@@ -58,9 +59,20 @@ const getNoticeById = async (req, res) => {
 // для додавання оголошення до обраних
 // для видалення оголошення авторизованого користувача доданих цим же до обраних
 const updateFavoriteNotice = async (req, res) => {
-    const { noticeId } = req.params
-    
-  const result = await Notice.findByIdAndUpdate(noticeId, req.body, { new: true })
+  const { noticeId } = req.params
+  const { _id } = req.user
+
+  const notice = await Notice.findById(noticeId)
+  if (!notice) {
+    throw HttpError(404, 'Not found')
+  }
+
+  const updatedNotice = {
+    ...notice.toObject(),
+    favoriteUsers: [...notice.favoriteUsers, _id] // Додати ідентифікатор користувача до масиву ідентифікаторів улюблених користувачів
+  }
+
+  const result = await Notice.findByIdAndUpdate(noticeId, updatedNotice, { new: true })
   if (!result) {
     throw HttpError(404, 'Not found')
   }
@@ -70,14 +82,20 @@ const updateFavoriteNotice = async (req, res) => {
 
 // для отримання оголошень авторизованого користувача доданих ним же в обрані
 const listFavoriteNotices = async (req, res) => {
-  // const { _id: owner } = req.user
-  const { page = 1, limit = 10, favorite = true} = req.query;
+  const { _id: owner } = req.user
+  const { page = 1, limit = 10 } = req.query
   const skip = (page - 1) * limit
-  const result = await Notice.find({ favorite }, '', { skip, limit })
 
-  if (result.length === 0) {
-        throw HttpError(404, "You don`t have favorite notice yet");
+  const favoriteNotices = await FavoriteNotice.find({ userId: owner })
+    .skip(skip)
+    .limit(limit)
+    .populate('noticeId')
+
+  if (favoriteNotices.length === 0) {
+    throw HttpError(404, "You don't have any favorite notices yet")
   }
+
+  const result = favoriteNotices.map(({ noticeId }) => noticeId)
 
   res.json(result)
 }
@@ -91,9 +109,9 @@ const addNotice = async (req, res) => {
     
     await moveFile(req.file, petAvatarsDirPath);
     await resizeImg(path.join(petAvatarsDirPath, req.file.filename), 300);
-    const file = path.join("petPhotos", req.file.filename)
+    const photoURL = path.join("petPhotos", req.file.filename)
 
-    const result = await Notice.create({...req.body, file, owner})
+    const result = await Notice.create({...req.body, photoURL, owner})
     res.status(201).json(result);
 }
 

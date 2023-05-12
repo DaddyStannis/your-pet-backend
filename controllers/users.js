@@ -90,6 +90,7 @@ async function getUserInfo(req, res) {
     city: user.city,
     email: user.email,
     avatarURL: user.avatarURL,
+    favorites: user.favorites,
   });
 }
 

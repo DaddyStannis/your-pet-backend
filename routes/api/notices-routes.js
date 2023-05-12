@@ -21,7 +21,7 @@ router.get("/find/:noticeId", noticesControllers.getNoticeById)
 
 // створити ендпоінт для додавання оголошення до обраних ++
 // створити ендпоінт для видалення оголошення авторизованого користувача доданих цим же до обраних ++ (in some reason the function "isValidId" is not working)
-router.patch("/favorite/:noticeId", validateBody(schemas.patchNoticeFavoriteSchema), noticesControllers.updateFavoriteNotice)
+router.patch("/favorite/:noticeId", authenticate, validateBody(schemas.patchNoticeFavoriteSchema), noticesControllers.updateFavoriteNotice)
 
 // створити ендпоінт для отримання оголошень авторизованого користувача доданих ним же в обрані ++
 router.get("/favorite", authenticate, noticesControllers.listFavoriteNotices)

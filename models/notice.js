@@ -32,7 +32,7 @@ const noticeSchema = new Schema({
         maxLength: 16,
         required: [true, "Set breed of your pet"]
     },
-    file: {
+    photoURL: {
         type: String,
     },
     sex: {
@@ -56,6 +56,10 @@ const noticeSchema = new Schema({
     favorite: {
         type: Boolean,
         default: false
+    },
+    favoriteUsers: {
+        type: Array,
+        default: []
     },
     owner: {
         type: Schema.Types.ObjectId,
@@ -83,7 +87,7 @@ const addNoticeSchema = Joi.object({
     breed: Joi.string().min(2).max(16).required().messages({
         'any.required': 'missing required breed field'
     }),
-    file: Joi.string(),
+    photoURL: Joi.string(),
     sex: Joi.string().regex(/^(male|female)$/).required().messages({
         'any.required': 'missing required sex field'
     }),
@@ -102,7 +106,8 @@ const addNoticeSchema = Joi.object({
         'any.required': 'missing required price field'
   }),
     comments: Joi.string().min(8).max(120).regex(/^[\s\S]*.*[^\s][\s\S]*$/),
-    favorite: Joi.boolean()
+    favorite: Joi.boolean(),
+    favoriteUsers: Joi.array()
 })
 
 const patchNoticeFavoriteSchema = Joi.object({
