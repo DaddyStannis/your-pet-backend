@@ -1,8 +1,11 @@
 import path from "path";
+import moment from "moment";
 import { Notice } from "../models/notice.js";
 import { User } from "../models/users.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
+import JWT from "jsonwebtoken";
+const { ACCESS_SECRET_KEY } = process.env;
 
 const petAvatarsDirPath = path.resolve("public", "petPhotos");
 
@@ -35,7 +38,7 @@ const getNoticesByCategory = async (req, res) => {
 
 // для отримання оголошень по категоріям + по заголовку
 const findNotices = async (req, res) => {
-  const { sex, birth, title, category, page = 1, limit = 10 } = req.query
+  const { sex, age, favorite = false, title, category, page = 1, limit = 10 } = req.query
   const skip = (page - 1) * limit
 
   const regex = new RegExp(title, "i")
@@ -45,22 +48,54 @@ const findNotices = async (req, res) => {
     filters.sex = sex;
   }
 
-  if (birth) {
-    filters.birth = birth;
-  }
+  const ageConditions = {
+    "1y": { from: 1, to: 2, period: "years" },
+    "2y": { from: 2, to: 3, period: "years" },
+    "3y": { from: 3, to: 4, period: "years" },
+    "4y": { from: 4, to: 5, period: "years" },
+    "5y": { from: 5, to: 6, period: "years" },
+    "6y": { from: 6, to: 7, period: "years" },
+    "7y": { from: 7, to: 8, period: "years" },
+    "8plus": { from: 8, to: 1000, period: "years" },
+    "3-12m": { from: 3, to: 13, period: "month" },
+    undefined: { from: 0, to: 1000, period: "years" },
+  };
 
-  if (req.user) {
-    const favorites = req.user.favorites || [];
+  const condition = ageConditions[age];
 
-    if (favorites.length > 0) {
-      filters._id = { $in: favorites };
-    }
-  }
+  const date = Date.now();
+  if (age) {
+   filters.birth = {
+      $lte: moment(date).subtract(condition.from, condition.period),
+      $gte: moment(date).subtract(condition.to, condition.period),
+    }}
 
   const notices = await Notice.find(filters, null, { skip, limit })
 
   if (notices.length === 0) {
       throw HttpError(404, "Not found");
+  }
+
+  const { authorization = "" } = req.headers;
+  const [_, token] = authorization.split(" ");
+
+  try {
+    const { id } = JWT.verify(token, ACCESS_SECRET_KEY);
+    const user = await User.findById(id);
+    
+    let data = notices.map((notice) => {
+      const favorite = user.favorites.includes(notice._id);
+      return { ...notice.toObject(), favorite};
+    })
+
+    if (favorite) {
+      data = data.filter(({favorite}) => favorite === true)
+    }
+
+    return res.json(data)
+
+  } catch (error) {
+    console.log(error)
   }
 
   res.json(notices)

@@ -34,6 +34,7 @@ const noticeSchema = new Schema({
     },
     photoURL: {
         type: String,
+        required: true
     },
     sex: {
         type: String,
