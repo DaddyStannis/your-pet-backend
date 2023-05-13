@@ -4,6 +4,7 @@ import path from "path";
 import JWT from "jsonwebtoken";
 
 import { User } from "../models/users.js";
+import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
@@ -112,6 +113,7 @@ async function getUserInfo(req, res) {
     city: user.city,
     email: user.email,
     avatarURL: user.avatarURL,
+    favorites: user.favorites,
   });
 }
 
@@ -131,6 +133,59 @@ async function updateUserInfo(req, res) {
   });
 }
 
+const addToFavorites = async (req, res) => {
+    const { noticeId } = req.params
+    const { _id } = req.user
+  
+    const user = await User.findById(_id)
+  
+    const notice = await Notice.findById(noticeId)
+    if (!notice) {
+      throw HttpError(404, `Notice with ${noticeId} not found`)
+    }
+  
+    if (user.favorites.includes(noticeId)) {
+      throw HttpError(400, 'The notice is already in yours favorites')
+    }
+
+    user.favorites.push(noticeId)
+
+    await user.save()
+
+    return res.status(200).json({ message: 'The notice is in yours favorites' })
+};
+
+const removeFromFavorites = async (req, res) => {
+    const { noticeId } = req.params
+    const { _id } = req.user
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'The user is not found' });
+    }
+
+    user.favorites = user.favorites.filter((favorite) => favorite !== noticeId);
+
+    await user.save();
+
+    return res.status(200).json({ message: 'The notice is not in yours favorites' });
+};
+
+const getUserFavorites = async (req, res) => {
+    const { _id } = req.user;
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'The user is not found' });
+    }
+
+    const favoriteNotices = await Notice.find({ _id: { $in: user.favorites } });
+
+    return res.status(200).json(favoriteNotices);
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
@@ -139,4 +194,7 @@ export default {
   updateAvatar: ctrlWrapper(updateAvatar),
   getUserInfo: ctrlWrapper(getUserInfo),
   updateUserInfo: ctrlWrapper(updateUserInfo),
+  addToFavorites: ctrlWrapper(addToFavorites),
+  removeFromFavorites: ctrlWrapper(removeFromFavorites),
+  getUserFavorites: ctrlWrapper(getUserFavorites),
 };

@@ -34,4 +34,10 @@ router.patch(
   controllers.updateAvatar
 );
 
+router.post('/favorites/:noticeId', authenticate, controllers.addToFavorites);
+
+router.delete('/favorites/:noticeId', authenticate, controllers.removeFromFavorites);
+
+router.get('/favorites', authenticate, controllers.getUserFavorites);
+
 export default router;

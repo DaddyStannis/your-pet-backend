@@ -36,6 +36,10 @@ const schema = new Schema(
       type: String,
       required: true,
     },
+    favorites: {
+      type: Array,
+      default: []
+    },
     refreshToken: { type: String, default: "" },
     accessToken: { type: String, default: "" },
   },
