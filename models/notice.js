@@ -75,7 +75,9 @@ const addNoticeSchema = Joi.object({
     name: Joi.string().min(2).max(16).required().messages({
         'any.required': 'missing required name field'
     }),
-    birth: Joi.date(),
+    birth: Joi.date().required().messages({
+        'any.required': 'missing required birth field'
+    }),
     breed: Joi.string().min(2).max(16).required().messages({
         'any.required': 'missing required breed field'
     }),
