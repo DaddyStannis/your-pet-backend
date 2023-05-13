@@ -33,12 +33,10 @@ const petSchema = new Schema({
     },
     sex: {
         type: String,
-        enum: ["male", "female"],
-        required: [true, "Set sex of your pet (male or female)"]
+        enum: ["male", "female"]
     },
     location: {
-        type: String,
-        required: [true, "Set the city of your pet. Where your pet is now"]
+        type: String
     },
     price: {
         type: Number
