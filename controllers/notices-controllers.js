@@ -1,5 +1,6 @@
 import path from "path";
 import { Notice } from "../models/notice.js";
+import { User } from "../models/users.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
@@ -46,6 +47,14 @@ const findNotices = async (req, res) => {
 
   if (birth) {
     filters.birth = birth;
+  }
+
+  if (req.user) {
+    const favorites = req.user.favorites || [];
+
+    if (favorites.length > 0) {
+      filters._id = { $in: favorites };
+    }
   }
 
   const notices = await Notice.find(filters, null, { skip, limit })
