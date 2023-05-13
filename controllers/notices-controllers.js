@@ -34,14 +34,24 @@ const getNoticesByCategory = async (req, res) => {
 
 // для отримання оголошень по категоріям + по заголовку
 const findNotices = async (req, res) => {
-  const { title, category, page = 1, limit = 10 } = req.query
+  const { sex, birth, title, category, page = 1, limit = 10 } = req.query
   const skip = (page - 1) * limit
 
-  const regex = new RegExp(title, "i");
-  const notices = await Notice.find({ title: regex, category: category ? category : "sell" }, '', { skip, limit })
+  const regex = new RegExp(title, "i")
+  const filters = { title: regex, category: category ? category : "sell" }
   
+  if (sex && (sex === "male" || sex === "female")) {
+    filters.sex = sex;
+  }
+
+  if (birth) {
+    filters.birth = birth;
+  }
+
+  const notices = await Notice.find(filters, null, { skip, limit })
+
   if (notices.length === 0) {
-        throw HttpError(404, "Not found");
+      throw HttpError(404, "Not found");
   }
 
   res.json(notices)
