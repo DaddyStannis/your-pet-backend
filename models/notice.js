@@ -24,7 +24,7 @@ const noticeSchema = new Schema({
     },
     birth: {
         type: Date,
-        default: null
+        required: true
     },
     breed: {
         type: String,
