@@ -1,18 +1,16 @@
 import bcrypt from "bcryptjs";
 import gravatar from "gravatar";
 import path from "path";
+import JWT from "jsonwebtoken";
 
 import { User } from "../models/users.js";
 import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
-import {
-  createToken,
-  moveFile,
-  resizeImg,
-  HttpError,
-} from "../helpers/index.js";
+import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
 const avatarsDirPath = path.resolve("public", "avatars");
+
+const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = process.env;
 
 async function register(req, res) {
   const { email, password } = req.body;
@@ -32,9 +30,7 @@ async function register(req, res) {
     password: hashedPassword,
   });
 
-  res.status(201).json({
-    email: newUser.email,
-  });
+  res.status(201).json({ email: newUser.email });
 }
 
 async function login(req, res) {
@@ -51,13 +47,17 @@ async function login(req, res) {
     throw HttpError(409, "Email or password is wrong");
   }
 
-  const token = createToken(user.id);
-  user.token = token;
+  user.accessToken = JWT.sign({ id: user._id }, ACCESS_SECRET_KEY, {
+    expiresIn: "20m",
+  });
+  user.refreshToken = JWT.sign({ id: user._id }, REFRESH_SECRET_KEY, {
+    expiresIn: "7D",
+  });
   user.save();
 
   res.json({
-    token,
-    email: user.email,
+    accessToken: user.accessToken,
+    refreshToken: user.refreshToken,
   });
 }
 
@@ -67,7 +67,31 @@ async function logout(req, res) {
 }
 
 async function current(req, res) {
-  res.json({ email: req.user.email });
+  const { refreshToken } = req.body;
+
+  try {
+    var { id } = JWT.verify(refreshToken, REFRESH_SECRET_KEY);
+  } catch (error) {
+    throw HttpError(403);
+  }
+
+  const isExist = User.findOne({ refreshToken });
+
+  if (!isExist) {
+    throw HttpError(403);
+  }
+
+  const updatedAccessToken = JWT.sign({ id }, ACCESS_SECRET_KEY, {
+    expiresIn: "2m",
+  });
+  const updatedRefreshToken = JWT.sign({ id }, REFRESH_SECRET_KEY, {
+    expiresIn: "7D",
+  });
+
+  res.json({
+    accessToken: updatedAccessToken,
+    refreshToken: updatedRefreshToken,
+  });
 }
 
 async function updateAvatar(req, res) {
@@ -77,9 +101,7 @@ async function updateAvatar(req, res) {
   const avatarURL = path.join("avatars", req.file.filename);
   await User.findByIdAndUpdate(_id, { avatarURL });
 
-  res.json({
-    avatarURL,
-  });
+  res.json({ avatarURL });
 }
 
 async function getUserInfo(req, res) {
