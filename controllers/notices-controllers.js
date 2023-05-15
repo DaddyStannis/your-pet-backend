@@ -116,7 +116,6 @@ const addNotice = async (req, res) => {
     const { _id: owner } = req.user
     
     await moveFile(req.file, petAvatarsDirPath);
-    await resizeImg(path.join(petAvatarsDirPath, req.file.filename), _, 3);
     const photoURL = path.join("petPhotos", req.file.filename)
 
     const result = await Notice.create({...req.body, photoURL, owner})
