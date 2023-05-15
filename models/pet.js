@@ -2,64 +2,69 @@ import { Schema, model } from "mongoose";
 import Joi from "joi";
 import { handleMongooseError } from "../helpers/index.js";
 
-const petSchema = new Schema({
+const petSchema = new Schema(
+  {
     type: {
-        type: String,
-        required: [true, "Set type of your pet"]
+      type: String,
+      required: [true, "Set type of your pet"],
     },
     name: {
-        type: String,
-        minLength: 2,
-        maxLength: 16,
-        required: [true, "Set name for your pet"]
+      type: String,
+      maxLength: 32,
+      required: [true, "Set name for your pet"],
     },
     birth: {
-        type: Date,
-        default: null
+      type: Date,
+      default: null,
     },
     breed: {
-        type: String,
-        minLength: 2,
-        maxLength: 16,
-        required: [true, "Set breed of your pet"]
+      type: String,
+      maxLength: 32,
+      required: [true, "Set breed of your pet"],
     },
     photoURL: {
-        type: String,
+      type: String,
     },
     comments: {
-        type: String,
-        minLength: 8,
-        maxLength: 120,
-        default: null
+      type: String,
+      maxLength: 120,
+      default: null,
     },
     owner: {
-        type: Schema.Types.ObjectId,
-        ref: 'user',
-        required: true,
-    }
-}, { versionKey: false })
+      type: Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
+  },
+  { versionKey: false }
+);
 
-petSchema.post('save', handleMongooseError)
+petSchema.post("save", handleMongooseError);
 
 const addPetSchema = Joi.object({
-    type: Joi.string().pattern(/^[A-Za-z ]+$/).required().messages({
-    'any.required': 'missing required type field'
+  type: Joi.string()
+    .pattern(/^[A-Za-z ]+$/)
+    .required()
+    .messages({
+      "any.required": "missing required type field",
+    }),
+  name: Joi.string().max(32).required().messages({
+    "any.required": "missing required name field",
   }),
-    name: Joi.string().min(2).max(16).required().messages({
-    'any.required': 'missing required name field'
+  birth: Joi.number(),
+  breed: Joi.string().max(32).required().messages({
+    "any.required": "missing required breed field",
   }),
-    birth: Joi.number(),
-    breed: Joi.string().min(2).max(16).required().messages({
-    'any.required': 'missing required breed field'
-  }),
-    photoURL: Joi.string(),
-    comments: Joi.string().min(8).max(120).regex(/^[\s\S]*.*[^\s][\s\S]*$/),
+  photoURL: Joi.string(),
+  comments: Joi.string()
+    .max(120)
+    .regex(/^[\s\S]*.*[^\s][\s\S]*$/),
 });
 
 const schemas = {
-    addPetSchema,
-}
+  addPetSchema,
+};
 
-const Pet = model('pet', petSchema)
+const Pet = model("pet", petSchema);
 
-export { Pet, schemas }
+export { Pet, schemas };
