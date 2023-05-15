@@ -105,7 +105,6 @@ const getNoticeById = async (req, res) => {
   if (!result) {
     throw HttpError(404, `Notice with ${id} not found`);
   }
-  console.log(213);
   res.json(result);
 };
 

@@ -16,11 +16,10 @@ const petAvatarsDirPath = path.resolve("public", "pet-photos");
 
 const addPet = async (req, res) => {
   const { _id: owner } = req.user;
-  console.log("Here");
 
   await moveFile(req.file, petAvatarsDirPath);
   const photoURL = path.join("pet-photos", req.file.filename);
-  console.log("Here");
+
   const result = await Pet.create({ ...req.body, photoURL, owner });
 
   res.status(201).json(result);
