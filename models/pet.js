@@ -3,11 +3,6 @@ import Joi from "joi";
 import { handleMongooseError } from "../helpers/index.js";
 
 const petSchema = new Schema({
-    category: {
-        type: String,
-        enum: ["my pet", "sell", "lost-found", "for-free"],
-        required: [true, "Set category for your pet"]
-    },
     type: {
         type: String,
         required: [true, "Set type of your pet"]
@@ -47,9 +42,6 @@ const petSchema = new Schema({
 petSchema.post('save', handleMongooseError)
 
 const addPetSchema = Joi.object({
-    category: Joi.string().regex(/^(my pet|sell|lost-found|for-free)$/).required().messages({
-        'any.required': 'missing field category'
-    }),
     type: Joi.string().pattern(/^[A-Za-z ]+$/).required().messages({
     'any.required': 'missing required type field'
   }),
