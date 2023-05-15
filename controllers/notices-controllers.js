@@ -72,8 +72,8 @@ const listNotices = async (req, res) => {
 
     let data = notices.map((notice) => {
       const favorite = user.favorites.includes(notice._id);
-      const owner = notice.owner.equals(id);
-      return { ...notice.toObject(), favorite, owner };
+      const own = notice.owner.equals(id);
+      return { ...notice.toObject(), favorite, own };
     });
 
     if (favorite) {
