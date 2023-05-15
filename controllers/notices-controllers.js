@@ -103,8 +103,8 @@ const findNotices = async (req, res) => {
 
 // для отримання одного оголошення
 const getNoticeById = async (req, res) => {
-    const { noticeId } = req.params
-    const result = await Notice.findById(noticeId).populate("owner")
+  const { noticeId } = req.params
+    const result = await Notice.findById(noticeId).populate("owner", "email phone")
     if (!result) {
       throw HttpError(404, `Notice with ${noticeId} not found`)
     }
