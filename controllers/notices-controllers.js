@@ -11,39 +11,54 @@ const petAvatarsDirPath = path.resolve("public", "petPhotos");
 
 // для пошуку оголошеннь по заголовку
 const getNoticesByTitleandKeyword = async (req, res) => {
-    const { title, page = 1, limit = 10 } = req.query
-    const skip = (page - 1) * limit
+  const { title, page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
 
-    const regex = new RegExp(title, "i");
-    const result = await Notice.find({ title: regex }, '', { skip, limit }).populate("owner")
+  const regex = new RegExp(title, "i");
+  const result = await Notice.find({ title: regex }, "", {
+    skip,
+    limit,
+  }).populate("owner");
 
-    if (result.length === 0) {
-        throw HttpError(404, "Not found");
-    }
+  if (result.length === 0) {
+    throw HttpError(404, "Not found");
+  }
 
-    res.json(result);
-}
+  res.json(result);
+};
 
 // для отримання оголошень по категоріям
 const getNoticesByCategory = async (req, res) => {
-    const { category, page = 1, limit = 10 } = req.query
-    const skip = (page - 1) * limit
+  const { category, page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
 
-    const notices = await Notice.find({
-        category: category ? category : "sell",
-    }, '',  { skip, limit }).populate("owner")
+  const notices = await Notice.find(
+    {
+      category: category ? category : "sell",
+    },
+    "",
+    { skip, limit }
+  ).populate("owner");
 
-    res.json(notices)
-}
+  res.json(notices);
+};
 
 // для отримання оголошень по категоріям + по заголовку
 const findNotices = async (req, res) => {
-  const { sex, age, favorite = false, title, category, page = 1, limit = 10 } = req.query
-  const skip = (page - 1) * limit
+  const {
+    sex,
+    age,
+    favorite = false,
+    title,
+    category,
+    page = 1,
+    limit = 10,
+  } = req.query;
+  const skip = (page - 1) * limit;
 
-  const regex = new RegExp(title, "i")
-  const filters = { title: regex, category: category ? category : "sell" }
-  
+  const regex = new RegExp(title, "i");
+  const filters = { title: regex, category: category ? category : "sell" };
+
   if (sex && (sex === "male" || sex === "female")) {
     filters.sex = sex;
   }
@@ -65,15 +80,16 @@ const findNotices = async (req, res) => {
 
   const date = Date.now();
   if (age) {
-   filters.birth = {
+    filters.birth = {
       $lte: moment(date).subtract(condition.from, condition.period),
       $gte: moment(date).subtract(condition.to, condition.period),
-    }}
+    };
+  }
 
-  const notices = await Notice.find(filters, null, { skip, limit })
+  const notices = await Notice.find(filters, null, { skip, limit });
 
   if (notices.length === 0) {
-      throw HttpError(404, "Not found");
+    throw HttpError(404, "Not found");
   }
 
   const { authorization = "" } = req.headers;
@@ -82,83 +98,85 @@ const findNotices = async (req, res) => {
   try {
     const { id } = JWT.verify(token, ACCESS_SECRET_KEY);
     const user = await User.findById(id);
-    
+
     let data = notices.map((notice) => {
       const favorite = user.favorites.includes(notice._id);
-      return { ...notice.toObject(), favorite};
-    })
+      return { ...notice.toObject(), favorite };
+    });
 
     if (favorite) {
-      data = data.filter(({favorite}) => favorite === true)
+      data = data.filter(({ favorite }) => favorite === true);
     }
 
-    return res.json(data)
-
+    return res.json(data);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 
-  res.json(notices)
-}
+  res.json(notices);
+};
 
 // для отримання одного оголошення
 const getNoticeById = async (req, res) => {
-  const { noticeId } = req.params
-    const result = await Notice.findById(noticeId).populate("owner", "email phone")
-    if (!result) {
-      throw HttpError(404, `Notice with ${noticeId} not found`)
-    }
-    res.json(result)
-}
+  const { noticeId } = req.params;
+  const result = await Notice.findById(noticeId).populate(
+    "owner",
+    "email phone"
+  );
+  if (!result) {
+    throw HttpError(404, `Notice with ${noticeId} not found`);
+  }
+  res.json(result);
+};
 
 // для додавання оголошень відповідно до обраної категорії
 const addNotice = async (req, res) => {
-    const { _id: owner } = req.user
-    
-    await moveFile(req.file, petAvatarsDirPath);
-    const photoURL = path.join("petPhotos", req.file.filename)
+  const { _id: owner } = req.user;
 
-    const result = await Notice.create({...req.body, photoURL, owner})
-    res.status(201).json(result);
-}
+  await moveFile(req.file, petAvatarsDirPath);
+  const photoURL = path.join("petPhotos", req.file.filename);
+
+  const result = await Notice.create({ ...req.body, photoURL, owner });
+  res.status(201).json(result);
+};
 
 // для отримання оголошень авторизованого кристувача створених цим же користувачем
 const listNotices = async (req, res) => {
-  const { _id: owner } = req.user
+  const { _id: owner } = req.user;
   const { page = 1, limit = 10 } = req.query;
-  const skip = (page - 1) * limit
-  const result = await Notice.find({ owner }, '', { skip, limit })
-  res.json(result)
-}
+  const skip = (page - 1) * limit;
+  const result = await Notice.find({ owner }, "", { skip, limit });
+  res.json(result);
+};
 
-// для видалення оголошення авторизованого користувача створеного цим же користувачем 
+// для видалення оголошення авторизованого користувача створеного цим же користувачем
 const removeNotice = async (req, res) => {
-    const { noticeId } = req.params
+  const { noticeId } = req.params;
 
-    const result = await Notice.findByIdAndDelete(noticeId)
-    if (!result) {
-      throw HttpError(404, `Notice with ${noticeId} not found`)
-    }
-    res.status(200).json({message: "Notice deleted"})
-}
-  
+  const result = await Notice.findByIdAndDelete(noticeId);
+  if (!result) {
+    throw HttpError(404, `Notice with ${noticeId} not found`);
+  }
+  res.status(200).json({ message: "Notice deleted" });
+};
+
 const allListNotices = async (req, res) => {
-    const notices = await Notice.find();
+  const notices = await Notice.find();
 
-    if (notices.length === 0) {
-      return res.status(404).json({ message: 'Notices not found' });
-    }
+  if (notices.length === 0) {
+    return res.status(404).json({ message: "Notices not found" });
+  }
 
-    res.status(200).json({ notices })
-}
+  res.status(200).json({ notices });
+};
 
 export default {
-    getNoticesByTitleandKeyword: ctrlWrapper(getNoticesByTitleandKeyword),
-    getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
-    findNotices: ctrlWrapper(findNotices),
-    getNoticeById: ctrlWrapper(getNoticeById),
-    addNotice: ctrlWrapper(addNotice),
-    listNotices: ctrlWrapper(listNotices),
+  getNoticesByTitleandKeyword: ctrlWrapper(getNoticesByTitleandKeyword),
+  getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
+  findNotices: ctrlWrapper(findNotices),
+  getNoticeById: ctrlWrapper(getNoticeById),
+  addNotice: ctrlWrapper(addNotice),
+  listNotices: ctrlWrapper(listNotices),
   removeNotice: ctrlWrapper(removeNotice),
-    allListNotices: ctrlWrapper(allListNotices),
-}
+  allListNotices: ctrlWrapper(allListNotices),
+};
