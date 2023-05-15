@@ -14,7 +14,7 @@ router.get("/", noticesControllers.listNotices);
 router.get("/my", authenticate, noticesControllers.getUserNotices);
 
 // для отримання одного оголошення ++ (in some reason the function "isValidId" is not working)
-router.get("/:noticeId", noticesControllers.getNoticeById);
+router.get("/:id", isValidId, noticesControllers.getNoticeById);
 
 // для додавання оголошень відповідно до обраної категорії ++
 router.post(
@@ -26,6 +26,6 @@ router.post(
 );
 
 // для видалення оголошення авторизованого користувача створеного цим же користувачем ++ (how to remove just users notices??)
-router.delete("/:noticeId", authenticate, noticesControllers.removeNotice);
+router.delete("/:id", authenticate, isValidId, noticesControllers.removeNotice);
 
 export default router;

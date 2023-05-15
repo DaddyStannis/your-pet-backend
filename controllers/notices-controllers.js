@@ -3,7 +3,7 @@ import moment from "moment";
 import { Notice } from "../models/notice.js";
 import { User } from "../models/users.js";
 import { ctrlWrapper } from "../decorators/index.js";
-import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
+import { moveFile, HttpError } from "../helpers/index.js";
 import JWT from "jsonwebtoken";
 const { ACCESS_SECRET_KEY } = process.env;
 
@@ -97,14 +97,14 @@ const getUserNotices = async (req, res) => {
 
 // для отримання одного оголошення
 const getNoticeById = async (req, res) => {
-  const { noticeId } = req.params;
-  const result = await Notice.findById(noticeId).populate(
-    "owner",
-    "email phone"
-  );
+  const { id } = req.params;
+
+  const result = await Notice.findById(id).populate("owner", "email phone");
+
   if (!result) {
-    throw HttpError(404, `Notice with ${noticeId} not found`);
+    throw HttpError(404, `Notice with ${id} not found`);
   }
+  console.log(213);
   res.json(result);
 };
 
@@ -121,11 +121,11 @@ const addNotice = async (req, res) => {
 
 // для видалення оголошення авторизованого користувача створеного цим же користувачем
 const removeNotice = async (req, res) => {
-  const { noticeId } = req.params;
+  const { id } = req.params;
 
-  const result = await Notice.findByIdAndDelete(noticeId);
+  const result = await Notice.findByIdAndDelete(id);
   if (!result) {
-    throw HttpError(404, `Notice with ${noticeId} not found`);
+    throw HttpError(404, `Notice with ${id} not found`);
   }
   res.status(200).json({ message: "Notice deleted" });
 };

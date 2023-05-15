@@ -2,7 +2,7 @@ import express from "express";
 
 import { schemas } from "../../models/pet.js";
 import petsControllers from "../../controllers/pets-controllers.js";
-import { authenticate, upload } from "../../middlewares/index.js";
+import { authenticate, isValidId, upload } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 
 const router = express.Router();
@@ -18,6 +18,6 @@ router.post(
   petsControllers.addPet
 );
 
-router.delete("/:id", petsControllers.deletePet);
+router.delete("/:id", isValidId, petsControllers.deletePet);
 
 export default router;
