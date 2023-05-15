@@ -48,7 +48,7 @@ async function login(req, res) {
   }
 
   user.accessToken = JWT.sign({ id: user._id }, ACCESS_SECRET_KEY, {
-    expiresIn: "20m",
+    expiresIn: "1D",
   });
   user.refreshToken = JWT.sign({ id: user._id }, REFRESH_SECRET_KEY, {
     expiresIn: "7D",
@@ -82,7 +82,7 @@ async function current(req, res) {
   }
 
   const updatedAccessToken = JWT.sign({ id }, ACCESS_SECRET_KEY, {
-    expiresIn: "2m",
+    expiresIn: "1D",
   });
   const updatedRefreshToken = JWT.sign({ id }, REFRESH_SECRET_KEY, {
     expiresIn: "7D",
@@ -134,56 +134,58 @@ async function updateUserInfo(req, res) {
 }
 
 const addToFavorites = async (req, res) => {
-    const { noticeId } = req.params
-    const { _id } = req.user
-  
-    const user = await User.findById(_id)
-  
-    const notice = await Notice.findById(noticeId)
-    if (!notice) {
-      throw HttpError(404, `Notice with ${noticeId} not found`)
-    }
-  
-    if (user.favorites.includes(noticeId)) {
-      throw HttpError(400, 'The notice is already in yours favorites')
-    }
+  const { noticeId } = req.params;
+  const { _id } = req.user;
 
-    user.favorites.push(noticeId)
+  const user = await User.findById(_id);
 
-    await user.save()
+  const notice = await Notice.findById(noticeId);
+  if (!notice) {
+    throw HttpError(404, `Notice with ${noticeId} not found`);
+  }
 
-    return res.status(200).json({ message: 'The notice is in yours favorites' })
+  if (user.favorites.includes(noticeId)) {
+    throw HttpError(400, "The notice is already in yours favorites");
+  }
+
+  user.favorites.push(noticeId);
+
+  await user.save();
+
+  return res.status(200).json({ message: "The notice is in yours favorites" });
 };
 
 const removeFromFavorites = async (req, res) => {
-    const { noticeId } = req.params
-    const { _id } = req.user
+  const { noticeId } = req.params;
+  const { _id } = req.user;
 
-    const user = await User.findById(_id);
+  const user = await User.findById(_id);
 
-    if (!user) {
-      return res.status(404).json({ message: 'The user is not found' });
-    }
+  if (!user) {
+    return res.status(404).json({ message: "The user is not found" });
+  }
 
-    user.favorites = user.favorites.filter((favorite) => favorite !== noticeId);
+  user.favorites = user.favorites.filter((favorite) => favorite !== noticeId);
 
-    await user.save();
+  await user.save();
 
-    return res.status(200).json({ message: 'The notice is not in yours favorites' });
+  return res
+    .status(200)
+    .json({ message: "The notice is not in yours favorites" });
 };
 
 const getUserFavorites = async (req, res) => {
-    const { _id } = req.user;
+  const { _id } = req.user;
 
-    const user = await User.findById(_id);
+  const user = await User.findById(_id);
 
-    if (!user) {
-      return res.status(404).json({ message: 'The user is not found' });
-    }
+  if (!user) {
+    return res.status(404).json({ message: "The user is not found" });
+  }
 
-    const favoriteNotices = await Notice.find({ _id: { $in: user.favorites } });
+  const favoriteNotices = await Notice.find({ _id: { $in: user.favorites } });
 
-    return res.status(200).json(favoriteNotices);
+  return res.status(200).json(favoriteNotices);
 };
 
 export default {
