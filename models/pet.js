@@ -31,16 +31,6 @@ const petSchema = new Schema({
     photoURL: {
         type: String,
     },
-    sex: {
-        type: String,
-        enum: ["male", "female"]
-    },
-    location: {
-        type: String
-    },
-    price: {
-        type: Number
-    },
     comments: {
         type: String,
         minLength: 8,
@@ -71,23 +61,6 @@ const addPetSchema = Joi.object({
     'any.required': 'missing required breed field'
   }),
     photoURL: Joi.string(),
-    sex: Joi.string().regex(/^(male|female)$/).required().messages({
-        'any.required': 'missing required sex field'
-    }),
-    location: Joi.string().pattern(/^[A-Za-z ]+$/).when("category", {
-      is: Joi.valid("sell", "lost-found", "for-free"),
-      then: Joi.required(),
-      otherwise: Joi.optional(),
-    }).messages({
-    'any.required': 'missing required location field'
-  }),
-    price: Joi.number().min(0).when("category", {
-      is: "sell",
-      then: Joi.number().min(1).required(),
-      otherwise: Joi.optional(),
-    }).messages({
-    'any.required': 'missing required price field'
-  }),
     comments: Joi.string().min(8).max(120).regex(/^[\s\S]*.*[^\s][\s\S]*$/),
 });
 
