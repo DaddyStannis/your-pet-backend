@@ -10,6 +10,7 @@ const noticeSchema = new Schema({
     },
     title: {
         type: String,
+        required: [true, "Set title of your pet"]
     },
     type: {
         type: String,
@@ -35,6 +36,18 @@ const noticeSchema = new Schema({
         type: String,
         required: true
     },
+    sex: {
+        type: String,
+        enum: ["male", "female"],
+        required: [true, "Set sex of your pet (male or female)"]
+    },
+    location: {
+        type: String,
+        required: [true, "Set the city of your pet. Where your pet is now"]
+    },
+    price: {
+        type: Number
+    },
     comments: {
         type: String,
         minLength: 8,
@@ -54,7 +67,9 @@ const addNoticeSchema = Joi.object({
     category: Joi.string().regex(/^(my pet|sell|lost-found|for-free)$/).required().messages({
         'any.required': 'missing field category'
     }),
-    title: Joi.string().pattern(/^[A-Za-z ]+$/),
+    title: Joi.string().pattern(/^[A-Za-z ]+$/).required().messages({
+        'any.required': 'missing required title field'
+    }),
     type: Joi.string().pattern(/^[A-Za-z ]+$/).required().messages({
         'any.required': 'missing required type field'
     }),
@@ -68,6 +83,23 @@ const addNoticeSchema = Joi.object({
         'any.required': 'missing required breed field'
     }),
     photoURL: Joi.string(),
+    sex: Joi.string().regex(/^(male|female)$/).required().messages({
+        'any.required': 'missing required sex field'
+    }),
+    location: Joi.string().pattern(/^[A-Za-z ]+$/).when("category", {
+      is: Joi.valid("sell", "lost-found", "for-free"),
+      then: Joi.required(),
+      otherwise: Joi.optional(),
+    }).messages({
+    'any.required': 'missing required location field'
+  }),
+    price: Joi.number().min(0).when("category", {
+      is: "sell",
+      then: Joi.number().min(1).required(),
+      otherwise: Joi.optional(),
+    }).messages({
+    'any.required': 'missing required price field'
+  }),
     comments: Joi.string().min(8).max(120).regex(/^[\s\S]*.*[^\s][\s\S]*$/),
 })
 
