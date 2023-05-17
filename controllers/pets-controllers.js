@@ -4,6 +4,8 @@ import { Pet } from "../models/pet.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
+const DEFAULT_ICON_NAME = "no-pictures.png";
+
 const listPet = async (req, res) => {
   const { _id: owner } = req.user;
   const { page = 1, limit = 5 } = req.query;
@@ -16,9 +18,14 @@ const petAvatarsDirPath = path.resolve("public", "pet-photos");
 
 const addPet = async (req, res) => {
   const { _id: owner } = req.user;
+  const { file = {} } = req;
 
-  await moveFile(req.file, petAvatarsDirPath);
-  const photoURL = path.join("pet-photos", req.file.filename);
+  if ("filename" in file) {
+    await moveFile(req.file, petAvatarsDirPath);
+  } else {
+    file.filename = DEFAULT_ICON_NAME;
+  }
+  const photoURL = path.join("pet-photos", file.filename);
 
   const result = await Pet.create({ ...req.body, photoURL, owner });
 

@@ -1,31 +1,31 @@
 import JWT from "jsonwebtoken";
 
 import { User } from "../models/users.js";
-import { HttpError } from "../helpers/index.js";
 
 const { ACCESS_SECRET_KEY } = process.env;
 
-async function authenticate(req, res, next) {
+async function authenticateIfHasToken(req, res, next) {
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
 
   if (bearer !== "Bearer") {
-    return next(HttpError(401));
+    return next();
   }
 
   try {
     var { id } = JWT.verify(token, ACCESS_SECRET_KEY);
   } catch {
-    return next(HttpError(401));
+    return next();
   }
 
   const user = await User.findById(id);
 
   if (!user || !user.accessToken) {
-    return next(HttpError(401));
+    return next();
   }
+
   req.user = user;
   next();
 }
 
-export default authenticate;
+export default authenticateIfHasToken;
