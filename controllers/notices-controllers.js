@@ -88,23 +88,19 @@ const getUserNotices = async (req, res) => {
 const getNoticeById = async (req, res) => {
   const { id } = req.params;
 
-  const notices = await Notice.findById(id).populate("owner", "email phone");
+  let notice = await Notice.findById(id).populate("owner", "email phone");
 
-  if (!notices) {
+  if (!notice) {
     throw HttpError(404, `Notice with ${id} not found`);
   }
 
   if (req.user) {
-    let data = notices.map((notice) => {
-      const favorite = req.user.favorites.includes(notice._id);
-      const own = notice.owner.equals(id);
-      return { ...notice.toObject(), favorite, own };
-    });
-
-    return res.json(data);
+    const favorite = req.user.favorites.includes(id);
+    const own = notice.owner.equals(req.user._id);
+    notice = { ...notice.toObject(), favorite, own };
   }
 
-  res.json(notices);
+  res.json(notice);
 };
 
 // для додавання оголошень відповідно до обраної категорії
