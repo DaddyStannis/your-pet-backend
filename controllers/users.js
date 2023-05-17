@@ -124,12 +124,13 @@ async function updateUserInfo(req, res) {
     { new: true }
   );
   res.json({
-    name: updatedUser.email,
+    name: updatedUser.name,
     birthday: updatedUser.birthday,
     phone: updatedUser.phone,
     city: updatedUser.city,
     email: updatedUser.email,
     avatarURL: updatedUser.avatarURL,
+    favorites: updatedUser.favorites,
   });
 }
 
