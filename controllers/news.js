@@ -1,6 +1,6 @@
 import News from "../models/news.js";
 import { ctrlWrapper } from "../decorators/index.js";
-
+import { HttpError } from "../helpers/index.js";
 async function getNews(req, res) {
   const { title, page = 1, limit = 10 } = req.query;
   const skip = (page - 1) * limit;
@@ -13,6 +13,10 @@ async function getNews(req, res) {
     skip,
     limit,
   });
+
+  if (result.length === 0) {
+    throw HttpError(404, "Not found");
+  }
 
   res.json({
     total: count,
