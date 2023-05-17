@@ -51,7 +51,7 @@ const addPetSchema = Joi.object({
   name: Joi.string().max(32).required().messages({
     "any.required": "missing required name field",
   }),
-  birth: Joi.number(),
+  birth: Joi.date(),
   breed: Joi.string().max(32).required().messages({
     "any.required": "missing required breed field",
   }),
