@@ -64,10 +64,14 @@ const listNotices = async (req, res) => {
   }
 
   const { authorization = "" } = req.headers;
-  const [_, token] = authorization.split(" ");
 
-  try {
-    const { id } = JWT.verify(token, ACCESS_SECRET_KEY);
+  if (authorization) {
+    const [_, token] = authorization.split(" ");
+
+    try {
+      var { id } = JWT.verify(token, ACCESS_SECRET_KEY);
+    } catch (error) {}
+
     const user = await User.findById(id);
 
     let data = notices.map((notice) => {
@@ -81,8 +85,6 @@ const listNotices = async (req, res) => {
     }
 
     return res.json(data);
-  } catch (error) {
-    console.log(error);
   }
 
   res.json(notices);
@@ -127,7 +129,7 @@ const removeNotice = async (req, res) => {
   if (!result) {
     throw HttpError(404, `Notice with ${id} not found`);
   }
-  res.status(200).json({ message: "Notice deleted" });
+  res.status(204).json();
 };
 
 export default {

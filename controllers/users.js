@@ -107,7 +107,7 @@ async function updateAvatar(req, res) {
 async function getUserInfo(req, res) {
   const { user } = req;
   res.json({
-    name: user.email,
+    name: user.name,
     birthday: user.birthday,
     phone: user.phone,
     city: user.city,
@@ -157,34 +157,20 @@ const addToFavorites = async (req, res) => {
 
 const removeFromFavorites = async (req, res) => {
   const { noticeId } = req.params;
-  const { _id } = req.user;
 
-  const user = await User.findById(_id);
+  req.user.favorites = req.user.favorites.filter(
+    (favorite) => favorite !== noticeId
+  );
 
-  if (!user) {
-    return res.status(404).json({ message: "The user is not found" });
-  }
+  await req.user.save();
 
-  user.favorites = user.favorites.filter((favorite) => favorite !== noticeId);
-
-  await user.save();
-
-  return res
-    .status(200)
-    .json({ message: "The notice is not in yours favorites" });
+  return res.status(204).json();
 };
 
 const getUserFavorites = async (req, res) => {
-  const { _id } = req.user;
-
-  const user = await User.findById(_id);
-
-  if (!user) {
-    return res.status(404).json({ message: "The user is not found" });
-  }
-
-  const favoriteNotices = await Notice.find({ _id: { $in: user.favorites } });
-
+  const favoriteNotices = await Notice.find({
+    _id: { $in: req.user.favorites },
+  });
   return res.status(200).json(favoriteNotices);
 };
 
