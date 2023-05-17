@@ -4,6 +4,7 @@ import { schemas } from "../../models/notice.js";
 import noticesControllers from "../../controllers/notices-controllers.js";
 import { authenticate, isValidId, upload } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
+import uploadCloud from "../../middlewares/uploadCloud.cjs"
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get("/:id", isValidId, noticesControllers.getNoticeById);
 router.post(
   "/",
   authenticate,
-  upload.single("file"),
+  uploadCloud.single("file"),
   validateBody(schemas.addNoticeSchema),
   noticesControllers.addNotice
 );
