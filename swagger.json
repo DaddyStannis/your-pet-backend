@@ -368,7 +368,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AllPetResponse"
+                  "$ref": "#/components/schemas/SponsorsResponse"
                 }
               }
             }
@@ -517,6 +517,13 @@
             "required": false,
             "type": "integer",
             "description": "Limit notice items in response array"
+          },
+          {
+            "in": "query",
+            "name": "only-mine",
+            "required": false,
+            "type": "bool",
+            "description": "Only user's notices"
           }
         ],
         "responses": {
@@ -988,7 +995,12 @@
           "comments": {
             "type": "string",
             "example": "Мій пес Дюк"
-          }
+          },
+          "favorite": {
+            "type": "string",
+            "example": false
+          },
+          "own": { "type": "bool", "example": true }
         }
       },
       "NoticeRequest": {
