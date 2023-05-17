@@ -8,7 +8,7 @@ import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
-const avatarsDirPath = path.resolve("public", "avatars");
+const AVATARS_DIR = path.resolve("public", "avatars");
 
 const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = process.env;
 
@@ -95,8 +95,8 @@ async function current(req, res) {
 }
 
 async function updateAvatar(req, res) {
-  await moveFile(req.file, avatarsDirPath);
-  await resizeImg(path.join(avatarsDirPath, req.file.filename), 250);
+  await moveFile(req.file, AVATARS_DIR);
+  await resizeImg(path.join(AVATARS_DIR, req.file.filename), 250);
   const { _id } = req.user;
   const avatarURL = path.join("avatars", req.file.filename);
   await User.findByIdAndUpdate(_id, { avatarURL });

@@ -1,7 +1,7 @@
 import express from "express";
 
 import { schemas } from "../../models/pet.js";
-import petsControllers from "../../controllers/pets-controllers.js";
+import petsControllers from "../../controllers/pets.js";
 import { authenticate, isValidId, upload } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 
