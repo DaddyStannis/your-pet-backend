@@ -8,7 +8,7 @@ const schema = new Schema(
   {
     password: {
       type: String,
-      required: [true, "Set password for user"],
+      required: [true, "Password is required"],
     },
     name: {
       type: String,
@@ -38,7 +38,7 @@ const schema = new Schema(
     },
     favorites: {
       type: Array,
-      default: []
+      default: [],
     },
     refreshToken: { type: String, default: "" },
     accessToken: { type: String, default: "" },
@@ -49,6 +49,14 @@ const schema = new Schema(
 const registerSchema = Joi.object({
   password: Joi.string().min(6).required(),
   email: Joi.string().pattern(emailRegexp).required(),
+});
+
+const updateInfoSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp),
+  name: Joi.string(),
+  birthday: Joi.date(),
+  phone: Joi.string(),
+  city: Joi.string(),
 });
 
 const loginSchema = Joi.object({
@@ -64,6 +72,7 @@ const schemas = {
   registerSchema,
   loginSchema,
   refreshSchema,
+  updateInfoSchema,
 };
 
 schema.post("save", handleMongooseError);

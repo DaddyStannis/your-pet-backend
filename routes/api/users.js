@@ -25,7 +25,12 @@ router.post(
 
 router.get("/me", authenticate, controllers.getUserInfo);
 
-router.patch("/me", authenticate, controllers.updateUserInfo);
+router.patch(
+  "/me",
+  authenticate,
+  validateBody(schemas.updateInfoSchema),
+  controllers.updateUserInfo
+);
 
 router.patch(
   "/avatars",
@@ -34,10 +39,14 @@ router.patch(
   controllers.updateAvatar
 );
 
-router.post('/favorites/:noticeId', authenticate, controllers.addToFavorites);
+router.post("/favorites/:noticeId", authenticate, controllers.addToFavorites);
 
-router.delete('/favorites/:noticeId', authenticate, controllers.removeFromFavorites);
+router.delete(
+  "/favorites/:noticeId",
+  authenticate,
+  controllers.removeFromFavorites
+);
 
-router.get('/favorites', authenticate, controllers.getUserFavorites);
+router.get("/favorites", authenticate, controllers.getUserFavorites);
 
 export default router;

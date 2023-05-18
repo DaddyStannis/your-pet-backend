@@ -8,7 +8,7 @@ import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
 
-const avatarsDirPath = path.resolve("public", "avatars");
+const AVATARS_DIR = path.resolve("public", "avatars");
 
 const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = process.env;
 
@@ -95,8 +95,8 @@ async function current(req, res) {
 }
 
 async function updateAvatar(req, res) {
-  await moveFile(req.file, avatarsDirPath);
-  await resizeImg(path.join(avatarsDirPath, req.file.filename), 250);
+  await moveFile(req.file, AVATARS_DIR);
+  await resizeImg(path.join(AVATARS_DIR, req.file.filename), 250);
   const { _id } = req.user;
   const avatarURL = path.join("avatars", req.file.filename);
   await User.findByIdAndUpdate(_id, { avatarURL });
@@ -107,7 +107,7 @@ async function updateAvatar(req, res) {
 async function getUserInfo(req, res) {
   const { user } = req;
   res.json({
-    name: user.email,
+    name: user.name,
     birthday: user.birthday,
     phone: user.phone,
     city: user.city,
@@ -124,12 +124,13 @@ async function updateUserInfo(req, res) {
     { new: true }
   );
   res.json({
-    name: updatedUser.email,
+    name: updatedUser.name,
     birthday: updatedUser.birthday,
     phone: updatedUser.phone,
     city: updatedUser.city,
     email: updatedUser.email,
     avatarURL: updatedUser.avatarURL,
+    favorites: updatedUser.favorites,
   });
 }
 
@@ -157,34 +158,20 @@ const addToFavorites = async (req, res) => {
 
 const removeFromFavorites = async (req, res) => {
   const { noticeId } = req.params;
-  const { _id } = req.user;
 
-  const user = await User.findById(_id);
+  req.user.favorites = req.user.favorites.filter(
+    (favorite) => favorite !== noticeId
+  );
 
-  if (!user) {
-    return res.status(404).json({ message: "The user is not found" });
-  }
+  await req.user.save();
 
-  user.favorites = user.favorites.filter((favorite) => favorite !== noticeId);
-
-  await user.save();
-
-  return res
-    .status(200)
-    .json({ message: "The notice is not in yours favorites" });
+  return res.status(204).json();
 };
 
 const getUserFavorites = async (req, res) => {
-  const { _id } = req.user;
-
-  const user = await User.findById(_id);
-
-  if (!user) {
-    return res.status(404).json({ message: "The user is not found" });
-  }
-
-  const favoriteNotices = await Notice.find({ _id: { $in: user.favorites } });
-
+  const favoriteNotices = await Notice.find({
+    _id: { $in: req.user.favorites },
+  });
   return res.status(200).json(favoriteNotices);
 };
 

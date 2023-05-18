@@ -2,6 +2,8 @@ import express from "express";
 import logger from "morgan";
 import cors from "cors";
 import "dotenv/config.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./swagger.json" assert { type: "json" };
 
 import usersRouter from "./routes/api/users.js";
 import petsRouter from "./routes/api/pets-routes.js";
@@ -14,7 +16,15 @@ const app = express();
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
 app.use(logger(formatsLogger));
-app.use(cors());
+
+const corsOptions = {
+  origin: "*",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.static("public"));
 
@@ -23,6 +33,8 @@ app.use("/pets", petsRouter);
 app.use("/news", newsRouter);
 app.use("/notices", noticesRouter);
 app.use("/sponsors", sponsorsRouter);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
