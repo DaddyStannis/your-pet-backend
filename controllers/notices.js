@@ -88,15 +88,15 @@ const getUserNotices = async (req, res) => {
 const getNoticeById = async (req, res) => {
   const { id } = req.params;
 
-  let notice = await Notice.findById(id).populate("owner", "email phone");
+  let notice = await Notice.findById(id).populate("owner", "email phone _id");
 
   if (!notice) {
     throw HttpError(404, `Notice with ${id} not found`);
   }
 
-  if (req.user) {
+  if (req.user && notice.owner) {
     const favorite = req.user.favorites.includes(id);
-    const own = notice.owner.equals(req.user._id);
+    const own = notice.owner._id.equals(req.user._id);
     notice = { ...notice.toObject(), favorite, own };
   }
 
