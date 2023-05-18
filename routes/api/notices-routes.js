@@ -1,7 +1,7 @@
 import express from "express";
 
 import { schemas } from "../../models/notice.js";
-import noticesControllers from "../../controllers/notices.js";
+import noticesControllers from "../../controllers/notices-controllers.js";
 import {
   authenticate,
   authenticateIfHasToken,
