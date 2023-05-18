@@ -108,15 +108,13 @@ const addNotice = async (req, res) => {
   const { _id: owner } = req.user;
   const { file = {} } = req;
 
-  if ("filename" in file) {
-    await moveFile(req.file, PET_AVATARS_DIR);
-  } else {
-    file.filename = DEFAULT_ICON_NAME;
+  if (!"filename" in file) {
+    file.filename = DEFAULT_ICON_NAME;    
   }
-
-  const photoURL = path.join("pet-photos", file.filename);
-
+  const photoURL = path.join("photos", file.filename);
+  
   const result = await Notice.create({ ...req.body, photoURL, owner });
+  
   res.status(201).json(result);
 };
 
@@ -138,3 +136,4 @@ export default {
   removeNotice: ctrlWrapper(removeNotice),
   getUserNotices: ctrlWrapper(getUserNotices),
 };
+

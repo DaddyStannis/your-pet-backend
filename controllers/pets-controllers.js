@@ -20,12 +20,10 @@ const addPet = async (req, res) => {
   const { _id: owner } = req.user;
   const { file = {} } = req;
 
-  if ("filename" in file) {
-    await moveFile(req.file, petAvatarsDirPath);
-  } else {
-    file.filename = DEFAULT_ICON_NAME;
+  if (!"filename" in file) {
+    file.filename = DEFAULT_ICON_NAME;    
   }
-  const photoURL = path.join("pet-photos", file.filename);
+  const photoURL = path.join("photos", file.filename);
 
   const result = await Pet.create({ ...req.body, photoURL, owner });
 
@@ -46,3 +44,4 @@ export default {
   addPet: ctrlWrapper(addPet),
   deletePet: ctrlWrapper(deletePet),
 };
+

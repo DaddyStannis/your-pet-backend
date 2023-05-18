@@ -60,9 +60,9 @@ const noticeSchema = new Schema(
     },
   },
   { versionKey: false }
-);
+)
 
-noticeSchema.post("save", handleMongooseError);
+noticeSchema.post("save", handleMongooseError)
 
 const addNoticeSchema = Joi.object({
   category: Joi.string()
@@ -129,6 +129,6 @@ const schemas = {
   addNoticeSchema,
 };
 
-const Notice = model("notice", noticeSchema);
+const Notice = model("notice", noticeSchema)
 
-export { Notice, schemas };
+export { Notice, schemas }

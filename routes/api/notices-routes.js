@@ -39,3 +39,4 @@ router.post(
 router.delete("/:id", authenticate, isValidId, noticesControllers.removeNotice);
 
 export default router;
+
