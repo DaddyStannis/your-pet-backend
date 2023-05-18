@@ -3,11 +3,9 @@ import moment from "moment";
 import { Notice } from "../models/notice.js";
 import { User } from "../models/users.js";
 import { ctrlWrapper } from "../decorators/index.js";
-import { moveFile, HttpError } from "../helpers/index.js";
+import { HttpError } from "../helpers/index.js";
 import JWT from "jsonwebtoken";
 const { ACCESS_SECRET_KEY } = process.env;
-
-const petAvatarsDirPath = path.resolve("public", "pet-photos");
 
 // для отримання оголошень по категоріям + по заголовку
 const listNotices = async (req, res) => {
@@ -110,13 +108,13 @@ const getNoticeById = async (req, res) => {
 
 // для додавання оголошень відповідно до обраної категорії
 const addNotice = async (req, res) => {
-  const { _id: owner } = req.user;
+  const { _id: owner } = req.user
 
-  // await moveFile(req.file, petAvatarsDirPath);
-  const photoURL = path.join("pet-photos", req.file.filename);
+  const photoURL = path.join("pet-photos", req.file.filename)
 
-  const result = await Notice.create({ ...req.body, photoURL, owner });
-  res.status(201).json(result);
+  const result = await Notice.create({ ...req.body, photoURL, owner })
+
+  res.status(201).json(result)
 };
 
 // для видалення оголошення авторизованого користувача створеного цим же користувачем
