@@ -1,8 +1,6 @@
-import path from "path";
-
 import { Pet } from "../models/pet.js";
 import { ctrlWrapper } from "../decorators/index.js";
-import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
+import { HttpError } from "../helpers/index.js";
 
 const DEFAULT_ICON_NAME = "no-pictures.png";
 
@@ -14,17 +12,14 @@ const listPet = async (req, res) => {
   res.json(result);
 };
 
-const petAvatarsDirPath = path.resolve("public", "pet-photos");
-
 const addPet = async (req, res) => {
   const { _id: owner } = req.user;
   const { file = {} } = req;
 
   if (!"filename" in file) {
-    file.filename = DEFAULT_ICON_NAME;    
+    file.filename = DEFAULT_ICON_NAME;
   }
-  const photoURL = path.join("photos", file.filename);
-
+  const photoURL = file.path;
   const result = await Pet.create({ ...req.body, photoURL, owner });
 
   res.status(201).json(result);
@@ -44,4 +39,3 @@ export default {
   addPet: ctrlWrapper(addPet),
   deletePet: ctrlWrapper(deletePet),
 };
-

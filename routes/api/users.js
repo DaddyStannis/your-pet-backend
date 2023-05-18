@@ -2,7 +2,7 @@ import express from "express";
 
 import { schemas } from "../../models/users.js";
 import controllers from "../../controllers/users.js";
-import { authenticate, upload } from "../../middlewares/index.js";
+import { authenticate, uploadCloud } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 
 const router = express.Router();
@@ -35,7 +35,7 @@ router.patch(
 router.patch(
   "/avatars",
   authenticate,
-  upload.single("avatar"),
+  uploadCloud.single("avatar"),
   controllers.updateAvatar
 );
 

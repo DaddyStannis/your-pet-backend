@@ -1,12 +1,12 @@
 import express from "express";
 
 import { schemas } from "../../models/notice.js";
-import noticesControllers from "../../controllers/notices-controllers.js";
+import noticesControllers from "../../controllers/notices.js";
 import {
   authenticate,
   authenticateIfHasToken,
   isValidId,
-  upload,
+  uploadCloud,
 } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 
@@ -30,7 +30,7 @@ router.get(
 router.post(
   "/",
   authenticate,
-  upload.single("file"),
+  uploadCloud.single("file"),
   validateBody(schemas.addNoticeSchema),
   noticesControllers.addNotice
 );
@@ -39,4 +39,3 @@ router.post(
 router.delete("/:id", authenticate, isValidId, noticesControllers.removeNotice);
 
 export default router;
-

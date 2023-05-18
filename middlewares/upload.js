@@ -19,7 +19,7 @@ function fileFilter(req, file, cb) {
   if (filetypeWhitelist.includes(mimetype)) {
     cb(null, true);
   } else {
-    cb({ message: "Invalid format. Allow only .png ot .jpg" }, false);
+    cb({ message: "Invalid format. Allow only .png or .jpg" }, false);
   }
 }
 

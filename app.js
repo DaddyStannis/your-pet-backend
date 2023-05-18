@@ -6,9 +6,9 @@ import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger.json" assert { type: "json" };
 
 import usersRouter from "./routes/api/users.js";
-import petsRouter from "./routes/api/pets-routes.js";
+import petsRouter from "./routes/api/pets.js";
 import newsRouter from "./routes/api/news.js";
-import noticesRouter from "./routes/api/notices-routes.js";
+import noticesRouter from "./routes/api/notices.js";
 import sponsorsRouter from "./routes/api/sponsors.js";
 
 const app = express();

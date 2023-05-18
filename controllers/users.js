@@ -6,7 +6,7 @@ import JWT from "jsonwebtoken";
 import { User } from "../models/users.js";
 import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
-import { moveFile, resizeImg, HttpError } from "../helpers/index.js";
+import { HttpError } from "../helpers/index.js";
 
 const AVATARS_DIR = path.resolve("public", "avatars");
 
@@ -95,10 +95,8 @@ async function current(req, res) {
 }
 
 async function updateAvatar(req, res) {
-  await moveFile(req.file, AVATARS_DIR);
-  await resizeImg(path.join(AVATARS_DIR, req.file.filename), 250);
   const { _id } = req.user;
-  const avatarURL = path.join("avatars", req.file.filename);
+  const avatarURL = path.join("avatars", req.file.path);
   await User.findByIdAndUpdate(_id, { avatarURL });
 
   res.json({ avatarURL });

@@ -1,10 +1,7 @@
-import path from "path";
 import moment from "moment";
 import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
-import { moveFile, HttpError } from "../helpers/index.js";
-
-const PET_AVATARS_DIR = path.resolve("public", "pet-photos");
+import { HttpError } from "../helpers/index.js";
 
 const DEFAULT_ICON_NAME = "no-pictures.png";
 
@@ -107,14 +104,13 @@ const getNoticeById = async (req, res) => {
 const addNotice = async (req, res) => {
   const { _id: owner } = req.user;
   const { file = {} } = req;
-
-  if (!"filename" in file) {
-    file.filename = DEFAULT_ICON_NAME;    
+  console.log(1);
+  if (!file.filename) {
+    file.filename = DEFAULT_ICON_NAME;
   }
-  const photoURL = path.join("photos", file.filename);
-  
+  const photoURL = file.path;
   const result = await Notice.create({ ...req.body, photoURL, owner });
-  
+
   res.status(201).json(result);
 };
 
@@ -136,4 +132,3 @@ export default {
   removeNotice: ctrlWrapper(removeNotice),
   getUserNotices: ctrlWrapper(getUserNotices),
 };
-
