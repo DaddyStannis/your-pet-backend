@@ -112,7 +112,7 @@ const getNoticeById = async (req, res) => {
 const addNotice = async (req, res) => {
   const { _id: owner } = req.user;
 
-  await moveFile(req.file, petAvatarsDirPath);
+  // await moveFile(req.file, petAvatarsDirPath);
   const photoURL = path.join("pet-photos", req.file.filename);
 
   const result = await Notice.create({ ...req.body, photoURL, owner });
