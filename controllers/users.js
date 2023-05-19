@@ -8,8 +8,6 @@ import { Notice } from "../models/notice.js";
 import { ctrlWrapper } from "../decorators/index.js";
 import { HttpError } from "../helpers/index.js";
 
-const AVATARS_DIR = path.resolve("public", "avatars");
-
 const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = process.env;
 
 async function register(req, res) {
@@ -95,10 +93,8 @@ async function current(req, res) {
 }
 
 async function updateAvatar(req, res) {
-  const { _id } = req.user;
-  const avatarURL = path.join("avatars", req.file.path);
-  await User.findByIdAndUpdate(_id, { avatarURL });
-
+  const avatarURL = req.file.path;
+  await User.findByIdAndUpdate(req.user._id, { avatarURL });
   res.json({ avatarURL });
 }
 
