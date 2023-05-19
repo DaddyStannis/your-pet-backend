@@ -163,10 +163,22 @@ const removeFromFavorites = async (req, res) => {
 };
 
 const getUserFavorites = async (req, res) => {
-  const favoriteNotices = await Notice.find({
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const count = await Notice.count({
     _id: { $in: req.user.favorites },
   });
-  return res.status(200).json(favoriteNotices);
+  const favoriteNotices = await Notice.find(
+    {
+      _id: { $in: req.user.favorites },
+    },
+    "",
+    { skip, limit }
+  );
+  return res.status(200).json({
+    total: count,
+    notices: favoriteNotices,
+  });
 };
 
 export default {
