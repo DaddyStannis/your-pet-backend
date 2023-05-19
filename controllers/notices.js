@@ -60,6 +60,7 @@ const listNotices = async (req, res) => {
     filters.owner = req.user;
   }
 
+  const count = await Notice.count({ title: regex });
   let notices = await Notice.find(filters, null, { skip, limit });
 
   if (req.user) {
@@ -70,7 +71,10 @@ const listNotices = async (req, res) => {
     });
   }
 
-  res.json(notices);
+  res.json({
+    total: count,
+    notices,
+  });
 };
 
 const getUserNotices = async (req, res) => {
