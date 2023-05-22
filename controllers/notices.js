@@ -5,7 +5,7 @@ import { HttpError } from "../helpers/index.js";
 
 const DEFAULT_ICON_NAME = "no-pictures.png";
 
-const AGE_CONDITIONS = {
+const AGE_CONDITION_PARAMS = {
   "1y": { from: 1, to: 2, period: "years" },
   "2y": { from: 2, to: 3, period: "years" },
   "3y": { from: 3, to: 4, period: "years" },
@@ -39,17 +39,42 @@ const listNotices = async (req, res) => {
     filters.category = category;
   }
 
-  if (sex && (sex === "male" || sex === "female")) {
-    filters.sex = sex;
+  if (sex) {
+    const genders = sex.split(",");
+
+    for (const gender of genders) {
+      if (!/^male|female$/.test(gender)) {
+        throw HttpError(400, `Unknown gender type "${gender}"`);
+      }
+    }
+    filters.sex = { $in: genders };
   }
 
   if (age) {
-    const condition = AGE_CONDITIONS[age];
     const date = Date.now();
-    filters.birth = {
-      $lte: moment(date).subtract(condition.from, condition.period),
-      $gte: moment(date).subtract(condition.to, condition.period),
-    };
+
+    const ageConditionList = age.split(",");
+
+    const criterieaList = [];
+
+    for (const condition of ageConditionList) {
+      try {
+        var params = AGE_CONDITION_PARAMS[condition];
+        if (!params) {
+          throw new Error();
+        }
+      } catch (error) {
+        throw HttpError(400, `Unknown age search condition "${condition}"`);
+      }
+      criterieaList.push({
+        birth: {
+          $lte: moment(date).subtract(params.from, params.period),
+          $gte: moment(date).subtract(params.to, params.period),
+        },
+      });
+    }
+
+    filters.$or = criterieaList;
   }
 
   if (req.user && favorite) {
@@ -113,7 +138,7 @@ const getNoticeById = async (req, res) => {
 const addNotice = async (req, res) => {
   const { _id: owner } = req.user;
   const { file = {} } = req;
-  console.log(1);
+
   if (!file.filename) {
     file.filename = DEFAULT_ICON_NAME;
   }
@@ -126,11 +151,19 @@ const addNotice = async (req, res) => {
 // для видалення оголошення авторизованого користувача створеного цим же користувачем
 const removeNotice = async (req, res) => {
   const { id } = req.params;
+  const { _id: owner } = req.user;
 
-  const result = await Notice.findByIdAndDelete(id);
-  if (!result) {
+  const notice = await Notice.findById(id);
+
+  if (!notice) {
     throw HttpError(404, `Notice with ${id} not found`);
   }
+
+  if (!notice.owner.equals(owner)) {
+    throw HttpError(404, `This notice does not belong to you`);
+  }
+
+  Notice.findByIdAndDelete(notice._id);
   res.status(204).json();
 };
 
