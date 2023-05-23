@@ -61,7 +61,7 @@ const noticeSchema = new Schema(
       required: true,
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 noticeSchema.post("save", handleMongooseError);

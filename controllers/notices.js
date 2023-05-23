@@ -96,6 +96,8 @@ const listNotices = async (req, res) => {
     });
   }
 
+  notices.sort((a, b) => b.createdAt - a.createdAt);
+
   res.json({
     total: count,
     notices,
