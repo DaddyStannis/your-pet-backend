@@ -165,7 +165,7 @@ const removeNotice = async (req, res) => {
     throw HttpError(404, `This notice does not belong to you`);
   }
 
-  Notice.findByIdAndDelete(notice._id);
+  await Notice.findByIdAndDelete(id);
   res.status(204).json();
 };
 
