@@ -73,7 +73,7 @@ async function current(req, res) {
     throw HttpError(403);
   }
 
-  const isExist = User.findOne({ refreshToken });
+  const isExist = await User.findOne({ refreshToken });
 
   if (!isExist) {
     throw HttpError(403);
