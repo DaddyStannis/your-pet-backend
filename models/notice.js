@@ -2,6 +2,8 @@ import { Schema, model } from "mongoose";
 import Joi from "joi";
 import { handleMongooseError } from "../helpers/index.js";
 
+const regEx = /^[^\u0400-\u04FF]*$/;
+
 const noticeSchema = new Schema(
   {
     category: {
@@ -60,36 +62,30 @@ const noticeSchema = new Schema(
     },
   },
   { versionKey: false }
-)
+);
 
-noticeSchema.post("save", handleMongooseError)
+noticeSchema.post("save", handleMongooseError);
 
 const addNoticeSchema = Joi.object({
   category: Joi.string()
-    .regex(/^(sell|lost-found|for-free)$/)
+    .pattern(/^(sell|lost-found|for-free)$/)
     .required()
     .messages({
       "any.required": "missing field category",
     }),
-  title: Joi.string()
-    .pattern(/^[A-Za-z ]+$/)
-    .required()
-    .messages({
-      "any.required": "missing required title field",
-    }),
-  type: Joi.string()
-    .pattern(/^[A-Za-z ]+$/)
-    .required()
-    .messages({
-      "any.required": "missing required type field",
-    }),
-  name: Joi.string().max(32).required().messages({
+  title: Joi.string().pattern(regEx).required().messages({
+    "any.required": "missing required title field",
+  }),
+  type: Joi.string().pattern(regEx).required().messages({
+    "any.required": "missing required type field",
+  }),
+  name: Joi.string().pattern(regEx).max(32).required().messages({
     "any.required": "missing required name field",
   }),
   birth: Joi.date().required().messages({
     "any.required": "missing required birth field",
   }),
-  breed: Joi.string().max(32).required().messages({
+  breed: Joi.string().pattern(regEx).max(32).required().messages({
     "any.required": "missing required breed field",
   }),
   photoURL: Joi.string(),
@@ -100,7 +96,7 @@ const addNoticeSchema = Joi.object({
       "any.required": "missing required sex field",
     }),
   location: Joi.string()
-    .pattern(/^[A-Za-z ]+$/)
+    .pattern(regEx)
     .when("category", {
       is: Joi.valid("sell", "lost-found", "for-free"),
       then: Joi.required(),
@@ -119,16 +115,13 @@ const addNoticeSchema = Joi.object({
     .messages({
       "any.required": "missing required price field",
     }),
-  comments: Joi.string()
-    .min(8)
-    .max(120)
-    .regex(/^[\s\S]*.*[^\s][\s\S]*$/),
+  comments: Joi.string().min(8).max(120).pattern(regEx),
 });
 
 const schemas = {
   addNoticeSchema,
 };
 
-const Notice = model("notice", noticeSchema)
+const Notice = model("notice", noticeSchema);
 
-export { Notice, schemas }
+export { Notice, schemas };

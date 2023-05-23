@@ -3,6 +3,7 @@ import Joi from "joi";
 import { handleMongooseError } from "../helpers/index.js";
 
 const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const regEx = /^[^\u0400-\u04FF]*$/;
 
 const schema = new Schema(
   {
@@ -53,10 +54,10 @@ const registerSchema = Joi.object({
 
 const updateInfoSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp),
-  name: Joi.string(),
+  name: Joi.string().pattern(regEx),
   birthday: Joi.date(),
   phone: Joi.string(),
-  city: Joi.string(),
+  city: Joi.string().pattern(regEx),
 });
 
 const loginSchema = Joi.object({

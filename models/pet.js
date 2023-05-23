@@ -2,6 +2,8 @@ import { Schema, model } from "mongoose";
 import Joi from "joi";
 import { handleMongooseError } from "../helpers/index.js";
 
+const regEx = /^[^\u0400-\u04FF]*$/;
+
 const petSchema = new Schema(
   {
     type: {
@@ -42,23 +44,18 @@ const petSchema = new Schema(
 petSchema.post("save", handleMongooseError);
 
 const addPetSchema = Joi.object({
-  type: Joi.string()
-    .pattern(/^[A-Za-z ]+$/)
-    .required()
-    .messages({
-      "any.required": "missing required type field",
-    }),
-  name: Joi.string().max(32).required().messages({
+  type: Joi.string().pattern(regEx).required().messages({
+    "any.required": "missing required type field",
+  }),
+  name: Joi.string().pattern(regEx).max(32).required().messages({
     "any.required": "missing required name field",
   }),
   birth: Joi.date(),
-  breed: Joi.string().max(32).required().messages({
+  breed: Joi.string().pattern(regEx).max(32).required().messages({
     "any.required": "missing required breed field",
   }),
   photoURL: Joi.string(),
-  comments: Joi.string()
-    .max(120)
-    .regex(/^[\s\S]*.*[^\s][\s\S]*$/),
+  comments: Joi.string().max(120).pattern(regEx),
 });
 
 const schemas = {
