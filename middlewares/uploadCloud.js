@@ -5,7 +5,7 @@ import multer from "multer";
 const { CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
   process.env;
 
-const ALLOWED_FORMATS = ["image/jpeg", "image/png"];
+const ALLOWED_FORMATS = ["jpeg", "png"];
 
 cloudinary.v2.config({
   cloud_name: CLOUDINARY_NAME,
