@@ -29,7 +29,6 @@ const petSchema = new Schema(
     },
     comments: {
       type: String,
-      maxLength: 120,
       default: null,
     },
     owner: {
@@ -55,7 +54,7 @@ const addPetSchema = Joi.object({
     "any.required": "missing required breed field",
   }),
   photoURL: Joi.string(),
-  comments: Joi.string().max(120).pattern(regEx),
+  comments: Joi.string().pattern(regEx),
 });
 
 const schemas = {

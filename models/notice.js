@@ -51,8 +51,6 @@ const noticeSchema = new Schema(
     },
     comments: {
       type: String,
-      minLength: 8,
-      maxLength: 120,
       default: null,
     },
     owner: {
@@ -115,7 +113,7 @@ const addNoticeSchema = Joi.object({
     .messages({
       "any.required": "missing required price field",
     }),
-  comments: Joi.string().min(8).max(120).pattern(regEx),
+  comments: Joi.string().pattern(regEx),
 });
 
 const schemas = {
