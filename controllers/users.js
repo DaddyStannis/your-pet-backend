@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import gravatar from "gravatar";
-import path from "path";
 import JWT from "jsonwebtoken";
 
 import { User } from "../models/users.js";
@@ -73,9 +72,9 @@ async function current(req, res) {
     throw HttpError(403);
   }
 
-  const isExist = await User.findOne({ refreshToken });
+  const user = await User.findOne({ refreshToken });
 
-  if (!isExist) {
+  if (!user) {
     throw HttpError(403);
   }
 
@@ -84,6 +83,11 @@ async function current(req, res) {
   });
   const updatedRefreshToken = JWT.sign({ id }, REFRESH_SECRET_KEY, {
     expiresIn: "7D",
+  });
+
+  await user.updateOne({
+    refreshToken: updatedRefreshToken,
+    accessToken: updatedAccessToken,
   });
 
   res.json({
